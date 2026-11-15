@@ -1,164 +1,606 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizza Topping Generator</title>
-    <style>
-        .pto-wrap { max-width: 600px; margin: 0 auto; padding: 2rem 1rem 2.5rem; text-align: center; font-family: sans-serif; }
-        .pto-title { font-size: 2.8rem; margin: 0 0 0.25rem; line-height: 1; }
-        .pto-subtitle { font-size: 13px; color: #666; margin: 0 0 2rem; letter-spacing: 0.08em; text-transform: uppercase; }
-        .pto-controls { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
-        .pto-controls select { font-size: 16px; padding: 10px 14px; min-width: 180px; flex: 1; max-width: 260px; border-radius: 8px; border: 1px solid #ccc; }
-        .pto-controls button { font-size: 16px; padding: 10px 28px; min-width: 140px; flex: 1; max-width: 200px; cursor: pointer; font-weight: 500; background: #333; color: white; border: none; border-radius: 8px; }
-        .pto-controls button:hover { background: #000; }
-        .pto-cards { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-        .pto-card { background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 1.5rem 1rem; text-align: center; flex: 1; min-width: 130px; max-width: 170px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .pto-card-icon { font-size: 2.4rem; margin-bottom: 10px; line-height: 1; }
-        .pto-card-name { font-size: 16px; font-weight: 500; color: #111; }
-        .pto-info { font-size: 13px; color: #666; margin-top: 0.75rem; }
-        .pto-empty { color: #999; font-size: 15px; padding: 2rem 0; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#b23a1e">
+<title>Pizzateig-Rechner</title>
+<style>
+:root{
+  --bg:#f7f2ea; --card:#fffdf9; --ink:#2b2420; --muted:#7a6d63; --line:#e7ddd0;
+  --accent:#b23a1e; --accent-ink:#fff; --accent-soft:#f6e1d9; --ok:#3f7d3a; --warn:#a66a00; --warn-soft:#fdf1d8;
+  --chip:#efe6da; --shadow:0 1px 2px rgba(60,40,20,.06),0 4px 16px rgba(60,40,20,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1614; --card:#241f1c; --ink:#f1e9e1; --muted:#a8998c; --line:#3a322d;
+    --accent:#e2694a; --accent-ink:#1a1614; --accent-soft:#3d2620; --ok:#7fbf77; --warn:#e5b04f; --warn-soft:#3a2e17;
+    --chip:#302924; --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:6px 0 18px}
+header h1{font-size:1.7rem;margin:0;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:620px){.grid{grid-template-columns:1fr}}
+label.f{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.stepper{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+.stepper button{border:0;background:transparent;color:var(--ink);width:40px;font-size:1.2rem;cursor:pointer}
+.stepper button:active{background:var(--chip)}
+.stepper input{flex:1;min-width:0;border:0;background:transparent;text-align:center;font:600 1.15rem system-ui,sans-serif;color:var(--ink);padding:9px 0;-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.unit{align-self:center;color:var(--muted);font-size:.85rem;padding-right:4px}
+.hint{font-size:.8rem;color:var(--muted);margin-top:5px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:.8rem;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+input[type=datetime-local]{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:.9rem}
+.styles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:620px){.styles{grid-template-columns:1fr 1fr}}
+.style{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;text-align:left;cursor:pointer;color:var(--ink);font:inherit}
+.style b{display:block;font-size:.95rem}
+.style span{font-size:.78rem;color:var(--muted)}
+.style[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+.styleinfo{margin-top:12px;font-size:.86rem;color:var(--muted);display:grid;gap:3px}
+.styleinfo strong{color:var(--ink);font-weight:600}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:1fr 150px 34px;align-items:center;gap:8px}
+.row .name{font-size:.95rem}
+.row .name small{display:block;color:var(--muted);font-size:.76rem}
+.row .in{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
+.row .in input{width:100%;border:0;background:transparent;color:var(--ink);font:600 1rem system-ui,sans-serif;padding:8px 6px 8px 10px;text-align:right}
+.row.changed .in{border-color:var(--warn);background:var(--warn-soft)}
+.reset{border:0;background:transparent;color:var(--warn);font-size:1.1rem;cursor:pointer;visibility:hidden;width:34px;height:34px;border-radius:8px}
+.row.changed .reset{visibility:visible}
+.reset:hover{background:var(--chip)}
+.toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.95rem}
+.toggle input{width:20px;height:20px;accent-color:var(--accent)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--bg);color:var(--ink);padding:7px 12px;font:inherit;font-size:.88rem;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.btn-link{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:4px 10px;font-size:.75rem;cursor:pointer;text-transform:none;letter-spacing:0}
+.btn-link:disabled{opacity:.4;cursor:default}
+.sep{border:0;border-top:1px dashed var(--line);margin:4px 0}
+.notice{border-radius:10px;padding:9px 12px;font-size:.86rem;margin-top:10px;background:var(--warn-soft);color:var(--ink);border-left:3px solid var(--warn)}
+.notice.ok{border-left-color:var(--ok);background:var(--chip)}
+table{width:100%;border-collapse:collapse}
+td{padding:8px 0;border-bottom:1px solid var(--line);font-size:1rem}
+td.g{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.p{text-align:right;color:var(--muted);font-size:.82rem;width:70px;font-variant-numeric:tabular-nums}
+tr.total td{border-bottom:0;font-weight:700;padding-top:10px}
+h3{font-size:.95rem;margin:14px 0 2px}
+h3:first-child{margin-top:0}
+.sub{font-size:.8rem;color:var(--muted);margin:0 0 4px}
+.big{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.kpi{flex:1;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi .v{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:.76rem;color:var(--muted)}
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl li{display:grid;grid-template-columns:88px 1fr;gap:12px;padding:8px 0;position:relative}
+.tl .t{font-variant-numeric:tabular-nums;font-weight:600;font-size:.88rem}
+.tl .t small{display:block;color:var(--muted);font-weight:400;font-size:.74rem}
+.tl .d{border-left:2px solid var(--line);padding-left:12px}
+.tl .d b{display:block;font-size:.95rem}
+.tl .d span{font-size:.84rem;color:var(--muted)}
+.tl li.cold .d{border-left-color:#5a8fc9}
+.tl li.hot .d{border-left-color:var(--accent)}
+.tips{margin:0;padding-left:18px;font-size:.9rem}
+.tips li{margin-bottom:6px}
+footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <h1>🍕 Pizzateig-Rechner</h1>
+    <p>für Hochtemperatur-Öfen bis 450 °C · Stretch &amp; Fold</p>
+  </header>
 
-<div class="pto-wrap">
-    <div class="pto-title">🍕🎽⚙️</div>
-    <div class="pto-subtitle">Pizza Topping Generator</div>
-
-    <div class="pto-controls">
-        <select id="filter">
-            <option value="vegan">🌿 Vegan</option>
-            <option value="veggi" selected>🥦 Vegetarisch</option>
-            <option value="fisch">🐟 Fisch</option>
-            <option value="fleisch">🥩 Fleisch</option>
-        </select>
-        <button onclick="generate()">Generieren</button>
+  <section class="card">
+    <h2>Grunddaten</h2>
+    <div class="grid">
+      <div>
+        <label class="f" for="n">Anzahl Pizzen</label>
+        <div class="stepper"><button data-step="n" data-d="-1" aria-label="weniger">−</button><input id="n" type="number" inputmode="numeric" min="1" max="50"><button data-step="n" data-d="1" aria-label="mehr">+</button></div>
+      </div>
+      <div>
+        <label class="f" for="h">Zeit bis Pizzaabend</label>
+        <div class="stepper"><button data-step="h" data-d="-1" aria-label="weniger">−</button><input id="h" type="number" inputmode="decimal" min="3" max="120" step="0.5"><span class="unit">h</span><button data-step="h" data-d="1" aria-label="mehr">+</button></div>
+        <div class="chips" id="hchips"></div>
+      </div>
+      <div>
+        <label class="f" for="rt">Raumtemperatur</label>
+        <div class="stepper"><button data-step="rt" data-d="-1" aria-label="kälter">−</button><input id="rt" type="number" inputmode="decimal" min="14" max="32" step="0.5"><span class="unit">°C</span><button data-step="rt" data-d="1" aria-label="wärmer">+</button></div>
+      </div>
     </div>
-
-    <div id="pto-cards-wrap">
-        <div class="pto-empty" id="empty-state">Lade JSON-Datenbank...</div>
-        <div id="toppings" class="pto-cards" style="display:none;"></div>
-        <div class="pto-info" id="info"></div>
+    <div style="margin-top:12px">
+      <label class="f" for="target">Pizzaabend um (Teig wird jetzt angesetzt)</label>
+      <input id="target" type="datetime-local">
     </div>
+  </section>
+
+  <section class="card">
+    <h2>Style</h2>
+    <div class="styles" id="styles"></div>
+    <div class="styleinfo" id="styleinfo"></div>
+  </section>
+
+  <section class="card">
+    <h2>Rezept <button class="btn-link" id="resetAll">Alles zurücksetzen</button></h2>
+    <div class="rows" id="rows"></div>
+    <hr class="sep" style="margin:14px 0">
+    <div class="rows">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <span>Hefe</span>
+        <div class="seg" id="yeastType">
+          <button data-v="fresh">Frischhefe</button><button data-v="dry">Trockenhefe</button>
+        </div>
+      </div>
+      <div class="row" id="row-fridge">
+        <label class="toggle"><input type="checkbox" id="fridge"> <span id="fridgeLabel">Gare im Kühlschrank</span></label>
+        <span class="hint" style="margin:0;text-align:right"><span id="fridgeHint"></span><label id="tfWrap" style="white-space:nowrap"> · bei <input id="tf" type="number" step="1" min="1" max="12" style="width:42px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);text-align:center;font:inherit"> °C</label></span>
+        <button class="reset" data-reset="fridge" title="Vorschlag wiederherstellen">↺</button>
+      </div>
+    </div>
+    <div id="notices"></div>
+  </section>
+
+  <section class="card">
+    <h2>Zutaten</h2>
+    <div class="big" id="kpis"></div>
+    <div id="ingredients"></div>
+  </section>
+
+  <section class="card">
+    <h2>Zeitplan</h2>
+    <ul class="tl" id="timeline"></ul>
+  </section>
+
+  <section class="card">
+    <h2>Tipps</h2>
+    <ul class="tips" id="tips"></ul>
+  </section>
+
+  <footer>Hefemengen sind Richtwerte aus einem Temperatur-Zeit-Modell. Mehl, Hefe und Kühlschrank verhalten sich unterschiedlich – nach 1–2 Backabenden ggf. nachjustieren.</footer>
 </div>
 
 <script>
-// Pfad zur JSON Datei (muss im gleichen Ordner liegen oder via URL erreichbar sein)
-const JSON_URL = 'pizza_data.json';
+(() => {
+'use strict';
 
-const CAT_ICON = { vegan: '🌿', veggi: '🥦', fisch: '🐟', fleisch: '🥩' };
-let DB = {};
+/* ---------- Styles (Originalrezepte, für 450 °C-Ofen) ---------- */
+const STYLES = {
+  neap: {
+    title:'Neapolitanisch', sub:'Direktteig',
+    hyd:62, ball:250, salt:3.0, oilOn:false, oil:0, yeastFactor:1.0,
+    sf:3, ddt:23, outBase:5, coldBalls:false,
+    flour:'Tipo 00 (W 260–320, ca. 12,5 % Protein)',
+    bake:'Ofen voll aufheizen: Stein ca. 430–450 °C, 60–90 s Backzeit, öfter drehen.',
+    size:'Ø 30–32 cm, Rand (Cornicione) nicht flachdrücken'
+  },
+  poolish: {
+    title:'Neapolitanisch', sub:'mit Poolish',
+    hyd:68, ball:260, salt:3.0, oilOn:false, oil:0, yeastFactor:1.0, poolish:40,
+    sf:3, ddt:23, outBase:5, coldBalls:false,
+    flour:'Tipo 00 (W 300–330) – starkes Mehl, v. a. für die Poolish',
+    bake:'Stein ca. 430–450 °C, 60–90 s. Höhere Hydration → luftigerer, aromatischer Rand.',
+    size:'Ø 30–33 cm'
+  },
+  roman: {
+    title:'Römisch', sub:'Tonda, dünn & knusprig',
+    hyd:58, ball:180, salt:2.5, oilOn:true, oil:4, yeastFactor:1.1,
+    sf:2, ddt:23, outBase:4, coldBalls:false,
+    flour:'Tipo 0 oder 00 (W 240–280)',
+    bake:'Ofen auf ca. 350–380 °C runterregeln, 2–3 min backen, bis der Boden durchgehend knusprig ist.',
+    size:'Ø 30–32 cm, mit dem Nudelholz hauchdünn ausrollen, kein Rand'
+  },
+  ny: {
+    title:'New York', sub:'groß, faltbar',
+    hyd:63, ball:300, salt:2.5, oilOn:true, oil:2.5, yeastFactor:1.3,
+    sf:3, ddt:22, outBase:3, coldBalls:true, preferFridge:true,
+    flour:'Brotmehl / Tipo 0 mit hohem Protein (13–14 %), z. B. 70 % Tipo 0 + 30 % Manitoba',
+    bake:'Ofen auf ca. 320–350 °C runterregeln, 3–5 min. Klassisch wird Zucker zugegeben – bei Hochtemperatur weglassen, sonst verbrennt der Boden.',
+    size:'ca. 35 cm (14″) bei 300 g, für 40 cm ca. 380 g'
+  }
+};
 
-// Lädt die Daten aus der JSON-Datei
-async function loadDatabase() {
-    try {
-        const response = await fetch(JSON_URL);
-        if (!response.ok) throw new Error('Datenbank konnte nicht geladen werden.');
-        DB = await response.json();
-        document.getElementById('empty-state').textContent = "Daten geladen. Wähle einen Filter und klicke auf Generieren.";
-    } catch (error) {
-        console.error("Fehler:", error);
-        document.getElementById('empty-state').textContent = "Fehler beim Laden der JSON-Datenbank.";
+/* ---------- Hefe-Modell ----------
+   Aktivität relativ zu 24 °C (≈ Verdopplung je ~8 °C, unter 12 °C stark gebremst).
+   Effektive Gärstunden E = Σ Stunden × Aktivität.
+   Frischhefe [% vom Mehl] aus E per log-log-Interpolation (kalibriert an gängigen Praxiswerten). */
+const act = T => Math.exp(0.09*(T-24)) * (T < 12 ? Math.exp(0.08*(T-12)) : 1);
+const YT = [[1.5,2.8],[2,2.0],[3,1.1],[4,0.7],[6,0.35],[8,0.22],[12,0.13],[16,0.09],[24,0.06],[36,0.04],[48,0.03],[72,0.02],[100,0.015],[150,0.01]];
+function freshPct(E){
+  if (E <= YT[0][0]) return YT[0][1];
+  for (let i=1;i<YT.length;i++){
+    const [x1,y1]=YT[i-1],[x2,y2]=YT[i];
+    if (E <= x2){
+      const t=(Math.log(E)-Math.log(x1))/(Math.log(x2)-Math.log(x1));
+      return Math.exp(Math.log(y1)+t*(Math.log(y2)-Math.log(y1)));
     }
+  }
+  return YT[YT.length-1][1];
 }
-
-function getCategoryIcon(tags) {
-    if (tags.includes('vegan')) return CAT_ICON.vegan;
-    if (tags.includes('veggi')) return CAT_ICON.veggi;
-    if (tags.includes('fisch')) return CAT_ICON.fisch;
-    if (tags.includes('fleisch')) return CAT_ICON.fleisch;
-    return '🍕';
+// Effektive Stunden für eine Phasenliste [{h, T}] inkl. Übergängen Kühlschrank <-> Raum
+function effHours(phases){ return phases.reduce((s,p)=>s+p.h*act(p.T),0); }
+function coldPhases(rt, tf, hours){ // Teig kühlt nicht sofort ab
+  const c=Math.min(2,hours); return [{h:c,T:(rt+tf)/2},{h:Math.max(0,hours-c),T:tf}];
 }
-
-function getAllowed(filterVal) {
-    return new Set(Object.keys(DB).filter(name => {
-        const tags = DB[name].tags;
-        if (filterVal === 'vegan') return tags.includes('vegan');
-        if (filterVal === 'veggi') return tags.includes('veggi') || tags.includes('vegan');
-        if (filterVal === 'fisch') return tags.includes('fisch') || tags.includes('veggi') || tags.includes('vegan');
-        if (filterVal === 'fleisch') return tags.includes('fleisch') || tags.includes('veggi') || tags.includes('vegan');
-        return false;
-    }));
+function warmPhases(rt, tf, hours){
+  const w=Math.min(1.5,hours); return [{h:w,T:(rt+tf)/2},{h:Math.max(0,hours-w),T:rt}];
 }
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function normalize(s) { return s.trim().toLowerCase(); }
-
-function pairsMatch(a, b) {
-    if (!DB[a] || !DB[b]) return false;
-    const aPairings = DB[a].pairings.map(normalize);
-    const bPairings = DB[b].pairings.map(normalize);
-    return aPairings.includes(normalize(b)) || bPairings.includes(normalize(a));
+/* ---------- State ---------- */
+const DEFAULTS = {n:4, h:24, rt:22, style:'neap', yeast:'fresh', tf:5, ov:{}};
+let S = load();
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem('pizzateig-v1')); if(s&&STYLES[s.style]) return Object.assign({},DEFAULTS,s,{ov:s.ov||{}}); }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULTS));
 }
+function save(){ try{ localStorage.setItem('pizzateig-v1', JSON.stringify(S)); }catch(e){} }
 
-async function generate() {
-    if (Object.keys(DB).length === 0) {
-        await loadDatabase();
-        if (Object.keys(DB).length === 0) return;
+/* ---------- Berechnung ---------- */
+function compute(){
+  const st=STYLES[S.style], ov=S.ov, H=S.h, rt=S.rt, tf=S.tf;
+  const isP = S.style==='poolish';
+  const tAdj = Math.exp(-0.09*(rt-22)); // wärmer -> kürzere Endgare
+
+  // Vorschläge (Rezept)
+  const sug = {hyd:st.hyd, ball:st.ball, salt:st.salt, oilOn:st.oilOn, oil:st.oilOn?st.oil:(st.oil||0), poolish:st.poolish||0, tf:5};
+  const val = k => (ov[k]!==undefined ? ov[k] : sug[k]);
+  const hyd=val('hyd'), ball=val('ball'), salt=val('salt'), oilOn=val('oilOn'), oil=oilOn?val('oil'):0, pShare=isP?val('poolish'):0;
+
+  // Phasen
+  let plan = {};
+  let E, poolE=0, fridgePossible, fridgeSuggested;
+  if (!isP){
+    const out = clamp(st.outBase*tAdj, st.coldBalls?1.5:2, st.coldBalls?4:7);
+    const pre = 2; // Mischen + S&F + kurze Stockgare
+    const fridgeH = H - pre - out;
+    fridgePossible = fridgeH >= 12;
+    fridgeSuggested = fridgePossible && (H >= 24 || st.preferFridge || rt >= 26);
+    const fridge = fridgePossible && (ov.fridge!==undefined ? ov.fridge : fridgeSuggested);
+    if (fridge){
+      E = effHours([{h:pre,T:rt}, ...coldPhases(rt,tf,fridgeH), ...warmPhases(rt,tf,out)]);
+      plan = {fridge, pre, fridgeH, out};
+    } else {
+      const appretto = H < 6 ? H*0.45 : clamp(H*0.35*tAdj, 2.5, 8);
+      E = H*act(rt);
+      plan = {fridge, appretto};
     }
+  } else {
+    const M = clamp(5*tAdj, 3, 7);          // Hauptteig-Phase
+    const P = Math.max(1, H - M);            // Poolish-Phase
+    fridgePossible = P >= 14;
+    fridgeSuggested = fridgePossible && (P >= 20 || rt >= 26);
+    const fridge = fridgePossible && (ov.fridge!==undefined ? ov.fridge : fridgeSuggested);
+    if (fridge){
+      poolE = effHours([{h:1,T:rt}, ...coldPhases(rt,tf,P-2), {h:1,T:(rt+tf)/2}]);
+    } else poolE = P*act(rt);
+    E = poolE;
+    plan = {fridge, M, P, appretto: M*0.6};
+  }
 
-    const filterVal = document.getElementById('filter').value;
-    
-    // 1. Zutat MUSS aus der gewählten Kategorie sein
-    const primaryPool = Object.keys(DB).filter(name => DB[name].tags.includes(filterVal));
-    
-    // Erlaubter Gesamtpool
-    const allowedSet = getAllowed(filterVal);
-    const allowedArr = [...allowedSet];
+  // Rezeptabhängige Korrektur: Salz bremst, Wasser beschleunigt
+  const recipeF = clamp(st.yeastFactor * (1+(salt-2.8)*0.15) * (1-(hyd-62)*0.01), 0.6, 1.6);
+  let yPctSug = freshPct(E) * recipeF * (isP ? 0.8 : 1); // Poolish (100 % Hydration) gärt schneller
+  if (S.yeast==='dry') yPctSug /= 3;
+  sug.yeast = +yPctSug.toPrecision(2);
+  const yPct = val('yeast');
 
-    if (primaryPool.length === 0 || allowedArr.length < 3) {
-        showError('Zu wenige Zutaten für diesen Filter.');
-        return;
-    }
+  // Mengen
+  const total = S.n * ball;
+  let flour, water, saltG, oilG, yeastG, poolishBlock=null, mainBlock=null;
+  if (!isP){
+    flour = total / (1 + hyd/100 + salt/100 + oil/100 + yPct/100);
+    water = flour*hyd/100; saltG=flour*salt/100; oilG=flour*oil/100; yeastG=flour*yPct/100;
+  } else {
+    // Hefe-% bezieht sich auf das Poolish-Mehl
+    const pf = pShare/100;
+    flour = total / (1 + hyd/100 + salt/100 + oil/100 + pf*yPct/100);
+    water = flour*hyd/100; saltG=flour*salt/100; oilG=flour*oil/100;
+    const pFlour = flour*pf, pWater = Math.min(pFlour, water);
+    yeastG = pFlour*yPct/100;
+    poolishBlock = {flour:pFlour, water:pWater, yeast:yeastG};
+    mainBlock = {flour:flour-pFlour, water:water-pWater, salt:saltG, oil:oilG};
+  }
 
-    let tries = 0, combo = null;
-    while (tries < 1000) {
-        tries++;
-        const t1 = rand(primaryPool);
-        
-        const p1 = (DB[t1]?.pairings || []).map(normalize);
-        const candidates2 = allowedArr.filter(t => t !== t1 && p1.includes(normalize(t)));
-        if (candidates2.length === 0) continue;
-        
-        const t2 = rand(candidates2);
-        
-        const bothPair = allowedArr.filter(t => t !== t1 && t !== t2 && pairsMatch(t, t1) && pairsMatch(t, t2));
-        if (bothPair.length === 0) continue;
-        
-        combo = [t1, t2, rand(bothPair)];
-        break;
-    }
+  // Wassertemperatur (Zielteigtemperatur, Mehltemp ≈ Raumtemp, Reibung S&F ≈ 2 °C)
+  let waterT, poolWaterT=null;
+  if (!isP){
+    const ddt = plan.fridge ? st.ddt-2 : st.ddt;
+    waterT = clamp(3*ddt - rt - rt - 2, 2, 35);
+  } else {
+    poolWaterT = clamp(2*(plan.fridge?20:21) - rt, 2, 30);
+    const poolT = plan.fridge ? (rt+tf)/2 : rt;
+    waterT = clamp(4*st.ddt - rt - rt - poolT - 2, 2, 30);
+  }
 
-    if (!combo) { 
-        showError('Keine passende Kombination gefunden. Nochmal versuchen!'); 
-        return; 
-    }
-
-    const tDiv = document.getElementById('toppings');
-    tDiv.innerHTML = combo.map(name => {
-        const icon = getCategoryIcon(DB[name].tags);
-        return `<div class="pto-card">
-          <div class="pto-card-icon">${icon}</div>
-          <div class="pto-card-name">${name}</div>
-        </div>`;
-    }).join('');
-
-    document.getElementById('info').textContent = 'Kombination gefunden!';
-    document.getElementById('toppings').style.display = 'flex';
-    document.getElementById('empty-state').style.display = 'none';
+  return {st, sug, val, hyd, ball, salt, oil, oilOn, pShare, yPct, total, flour, water, saltG, oilG, yeastG,
+          poolishBlock, mainBlock, plan, E, fridgePossible, fridgeSuggested, waterT, poolWaterT, isP};
 }
 
-function showError(msg) {
-    document.getElementById('toppings').style.display = 'none';
-    document.getElementById('info').textContent = msg;
-    document.getElementById('empty-state').style.display = 'block';
-    document.getElementById('empty-state').textContent = '';
+/* ---------- Rendering ---------- */
+const $ = id => document.getElementById(id);
+const fmt = (v,d=0) => v.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const g = v => v>=10 ? fmt(v)+' g' : v>=1 ? fmt(v,1)+' g' : fmt(v,2)+' g';
+
+function renderStyles(){
+  $('styles').innerHTML = Object.entries(STYLES).map(([k,s]) =>
+    `<button class="style" data-style="${k}" aria-pressed="${S.style===k}"><b>${s.title}</b><span>${s.sub}</span></button>`).join('');
+  const s=STYLES[S.style];
+  $('styleinfo').innerHTML = `<div><strong>Mehl:</strong> ${s.flour}</div><div><strong>Backen:</strong> ${s.bake}</div><div><strong>Größe:</strong> ${s.size}</div>`;
 }
 
-window.onload = loadDatabase;
+const ROWS = [
+  {k:'hyd', name:'Hydration', unit:'%', step:0.5, dec:1, help:'Wasser bezogen auf Mehl'},
+  {k:'ball', name:'Teigling', unit:'g', step:5, dec:0, help:'Gewicht pro Pizza'},
+  {k:'salt', name:'Salz', unit:'%', step:0.1, dec:1, help:'bezogen auf Mehl'},
+  {k:'oil', name:'Olivenöl', unit:'%', step:0.5, dec:1, help:'bezogen auf Mehl', toggle:'oilOn'},
+  {k:'poolish', name:'Poolish-Anteil', unit:'%', step:5, dec:0, help:'Anteil am Gesamtmehl (100 % Hydration)', only:'poolish'},
+  {k:'yeast', name:'Hefe', unit:'%', step:0.01, dec:3, help:''},
+];
+
+function renderRows(r){
+  const html = ROWS.filter(x=>!x.only || x.only===S.style).map(x=>{
+    const v=r.val(x.k), changed = S.ov[x.k]!==undefined || (x.toggle && S.ov[x.toggle]!==undefined);
+    let name = x.name, help=x.help;
+    if (x.k==='yeast'){
+      name = (S.yeast==='dry'?'Trockenhefe':'Frischhefe') + ' <span style="color:var(--muted);font-size:.8rem">(berechnet)</span>';
+      help = r.isP ? 'bezogen auf das Poolish-Mehl' : 'bezogen auf Mehl';
+    }
+    if (x.toggle){
+      name = `<label class="toggle" style="display:inline-flex"><input type="checkbox" data-toggle="${x.toggle}" ${r.oilOn?'checked':''}> ${x.name}</label>`;
+    }
+    const disabled = x.toggle && !r.oilOn;
+    const shown = x.k==='yeast' ? (+v).toFixed(v<0.1?3:2) : fmt(+v, x.dec).replace(/\./g,'').replace(',', '.');
+    return `<div class="row ${changed?'changed':''}">
+      <div class="name">${name}<small>${help}${changed?` · Vorschlag: ${x.k==='yeast'? (+r.sug[x.k]).toString().replace('.',',') : fmt(r.sug[x.k],x.dec)} ${x.unit}`:''}</small></div>
+      <div class="in" style="${disabled?'opacity:.45':''}"><input type="number" inputmode="decimal" step="${x.step}" data-k="${x.k}" value="${shown}" ${disabled?'disabled':''}><span class="unit">${x.unit}&nbsp;</span></div>
+      <button class="reset" data-reset="${x.k}${x.toggle?','+x.toggle:''}" title="Vorschlag wiederherstellen">↺</button>
+    </div>`;
+  }).join('');
+  const rows=$('rows');
+  // Fokus erhalten, wenn ein Feld gerade bearbeitet wird
+  const active=document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.k : null;
+  if (active && rows.contains(document.activeElement)) {
+    // nur Nachbar-Felder und Klassen aktualisieren
+    const tmp=document.createElement('div'); tmp.innerHTML=html;
+    [...tmp.children].forEach((nr,i)=>{
+      const cur=rows.children[i]; if(!cur) return;
+      const ci=cur.querySelector('input[data-k]'), ni=nr.querySelector('input[data-k]');
+      cur.className=nr.className;
+      cur.querySelector('.name small').innerHTML=nr.querySelector('.name small').innerHTML;
+      if (ci && ci.dataset.k!==active) ci.value=ni.value;
+    });
+    return;
+  }
+  rows.innerHTML = html;
+}
+
+function renderFridge(r){
+  const cb=$('fridge'), row=$('row-fridge');
+  cb.disabled = !r.fridgePossible;
+  cb.checked = r.plan.fridge;
+  $('fridgeLabel').textContent = r.isP ? 'Poolish im Kühlschrank' : 'Gare im Kühlschrank';
+  const hint = !r.fridgePossible ? (r.isP?'ab ca. ':'ab ca. ')+minFridgeHours(r)+' h möglich'
+             : r.fridgeSuggested ? 'empfohlen' : 'optional';
+  $('fridgeHint').textContent = hint;
+  $('tfWrap').style.display = r.plan.fridge ? '' : 'none';
+  if (document.activeElement!==$('tf')) $('tf').value = S.tf;
+  row.classList.toggle('changed', S.ov.fridge!==undefined && r.fridgePossible);
+}
+function minFridgeHours(r){
+  if (r.isP) return Math.ceil(14 + r.plan.M);
+  const tAdj=Math.exp(-0.09*(S.rt-22)), st=r.st;
+  return Math.ceil(2 + 12 + clamp(st.outBase*tAdj, st.coldBalls?1.5:2, st.coldBalls?4:7));
+}
+
+function renderNotices(r){
+  const n=[];
+  if (!r.plan.fridge && !r.isP && S.h>30) n.push(['','Sehr lange Gare bei Raumtemperatur – die Hefemenge wird winzig und der Teig kann übersäuern. Kühlschrank-Gare ist hier deutlich sicherer.']);
+  if (!r.plan.fridge && S.rt>=26 && S.h>=12) n.push(['','Warmer Raum: Teig im Auge behalten. Bei Übergare Teiglinge zwischendurch kurz kühl stellen.']);
+  if (r.isP && r.plan.P<8) n.push(['','Für Poolish ist die Zeit knapp (Poolish < 8 h). Die Hefemenge wird hoch – Direktteig wäre hier die bessere Wahl.']);
+  if (!r.isP && S.h<6) n.push(['','Kurze Gare: Pizza wird gehen, aber Aroma und Bekömmlichkeit profitieren stark von ≥ 8 h.']);
+  if (r.yPct > 0 && r.yeastG < 1) n.push(['ok',`Kleine Hefemenge: 1 g ${S.yeast==='dry'?'Trockenhefe':'Frischhefe'} in 100 g Wasser (aus der Rezeptmenge) auflösen und davon <b>${fmt(r.yeastG*100)} g</b> verwenden.`]);
+  if (r.hyd>70 && S.style!=='poolish') n.push(['','Hohe Hydration – mehr Stretch & Fold-Runden und ein starkes Mehl einplanen.']);
+  $('notices').innerHTML = n.map(([c,t])=>`<div class="notice ${c}">${t}</div>`).join('');
+}
+
+function renderIngredients(r){
+  const yName = S.yeast==='dry' ? 'Trockenhefe (Instant)' : 'Frischhefe';
+  const pct = (v)=> fmt(v/r.flour*100, 1)+' %';
+  $('kpis').innerHTML = `
+    <div class="kpi"><div class="v">${fmt(r.total)} g</div><div class="l">Teig gesamt · ${S.n} × ${fmt(r.ball)} g</div></div>
+    <div class="kpi"><div class="v">${g(r.yeastG)}</div><div class="l">${yName}</div></div>
+    <div class="kpi"><div class="v">${fmt(r.waterT)} °C</div><div class="l">Wassertemperatur${r.isP?' Hauptteig':''}</div></div>`;
+  let h='';
+  if (!r.isP){
+    h += `<table>
+      <tr><td>Mehl</td><td class="p">100 %</td><td class="g">${g(r.flour)}</td></tr>
+      <tr><td>Wasser <small style="color:var(--muted)">(${fmt(r.waterT)} °C)</small></td><td class="p">${pct(r.water)}</td><td class="g">${g(r.water)}</td></tr>
+      <tr><td>Salz</td><td class="p">${pct(r.saltG)}</td><td class="g">${g(r.saltG)}</td></tr>
+      ${r.oilG>0?`<tr><td>Olivenöl</td><td class="p">${pct(r.oilG)}</td><td class="g">${g(r.oilG)}</td></tr>`:''}
+      <tr><td>${yName}</td><td class="p">${fmt(r.yPct,3)} %</td><td class="g">${g(r.yeastG)}</td></tr>
+      <tr class="total"><td>Gesamt</td><td></td><td class="g">${g(r.flour+r.water+r.saltG+r.oilG+r.yeastG)}</td></tr>
+    </table>`;
+  } else {
+    const p=r.poolishBlock, m=r.mainBlock;
+    h += `<h3>1 · Poolish</h3><p class="sub">Wasser ca. ${fmt(r.poolWaterT)} °C · ${fmt(r.pShare)} % des Mehls</p><table>
+      <tr><td>Mehl</td><td class="g">${g(p.flour)}</td></tr>
+      <tr><td>Wasser</td><td class="g">${g(p.water)}</td></tr>
+      <tr><td>${yName} <small style="color:var(--muted)">(${fmt(r.yPct,3)} % v. Poolish-Mehl)</small></td><td class="g">${g(p.yeast)}</td></tr>
+    </table>
+    <h3>2 · Hauptteig</h3><p class="sub">Wasser ca. ${fmt(r.waterT)} °C</p><table>
+      <tr><td>Poolish (komplett)</td><td class="g">${g(p.flour+p.water+p.yeast)}</td></tr>
+      <tr><td>Mehl</td><td class="g">${g(m.flour)}</td></tr>
+      <tr><td>Wasser</td><td class="g">${g(m.water)}</td></tr>
+      <tr><td>Salz</td><td class="g">${g(m.salt)}</td></tr>
+      ${m.oil>0?`<tr><td>Olivenöl</td><td class="g">${g(m.oil)}</td></tr>`:''}
+    </table>
+    <h3>Gesamt</h3><table>
+      <tr><td>Mehl</td><td class="p">100 %</td><td class="g">${g(r.flour)}</td></tr>
+      <tr><td>Wasser</td><td class="p">${pct(r.water)}</td><td class="g">${g(r.water)}</td></tr>
+      <tr><td>Salz</td><td class="p">${pct(r.saltG)}</td><td class="g">${g(r.saltG)}</td></tr>
+      ${r.oilG>0?`<tr><td>Olivenöl</td><td class="p">${pct(r.oilG)}</td><td class="g">${g(r.oilG)}</td></tr>`:''}
+      <tr><td>${yName}</td><td class="p"></td><td class="g">${g(r.yeastG)}</td></tr>
+    </table>`;
+  }
+  $('ingredients').innerHTML = h;
+}
+
+/* ---------- Zeitplan ---------- */
+function clock(hOffset){
+  const d=new Date(Date.now()+hOffset*3600e3);
+  d.setMinutes(Math.round(d.getMinutes()/5)*5,0,0);
+  const day=d.toLocaleDateString('de-DE',{weekday:'short'});
+  const t=d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  return {day,t};
+}
+const dur = h => { const m=Math.round(h*60/15)*15; const hh=Math.floor(m/60), mm=m%60; return hh? (mm? `${hh} h ${mm} min` : `${hh} h`) : `${mm} min`; };
+
+function sfSteps(t0, sets, label){
+  const out=[];
+  out.push({t:t0, b:label, s:'Wasser (mit gelöstem Salz) vorlegen, Mehl nach und nach einarbeiten, Hefe zugeben. Nur grob vermengen, bis kein trockenes Mehl mehr da ist. Abgedeckt 20 min ruhen.'});
+  for (let i=1;i<=sets;i++) out.push({t:t0+ (20+ (i-1)*25)/60, b:`Stretch & Fold ${i}/${sets}`, s: i===1?'Mit nassen Händen Teig an einer Seite hochziehen und überfalten, Schüssel 90° drehen, 4× rundum. Abdecken.' : 'Wie zuvor – der Teig wird spürbar glatter und elastischer.'});
+  return out;
+}
+
+function renderTimeline(r){
+  const st=r.st, p=r.plan, H=S.h, steps=[];
+  const ballTxt = 'Teiglinge abwiegen, rund schleifen (Oberfläche straff), in geölte/bemehlte Box mit Abstand, luftdicht abdecken.';
+  if (!r.isP){
+    steps.push(...sfSteps(0, st.sf, 'Teig ansetzen'));
+    const sfEnd = (20+(st.sf-1)*25)/60;
+    if (p.fridge){
+      if (st.coldBalls){
+        steps.push({t:p.pre, b:'Teiglinge formen → Kühlschrank', s:ballTxt+` Ab in den Kühlschrank (${S.tf} °C).`, cls:'cold'});
+      } else {
+        steps.push({t:p.pre, b:'Ab in den Kühlschrank', s:`Teig in leicht geölter, verschlossener Box als Stockgare in den Kühlschrank (${S.tf} °C).`, cls:'cold'});
+      }
+      steps.push({t:p.pre+p.fridgeH, b: st.coldBalls?'Teiglinge aus dem Kühlschrank':'Raus & Teiglinge formen', s: st.coldBalls?`Box geschlossen bei Raumtemperatur akklimatisieren lassen (${dur(p.out)}).`:`${ballTxt} Endgare ${dur(p.out)} bei Raumtemperatur.`});
+    } else {
+      const ballAt = H - p.appretto;
+      if (ballAt - sfEnd > 0.5) steps.push({t:sfEnd+0.1, b:'Stockgare', s:`Abgedeckt bei ${fmt(S.rt,1)} °C ruhen lassen (${dur(ballAt-sfEnd)}).`});
+      steps.push({t:Math.max(ballAt, sfEnd+0.25), b:'Teiglinge formen', s:`${ballTxt} Endgare ${dur(p.appretto)}.`});
+    }
+  } else {
+    if (p.fridge){
+      steps.push({t:0, b:'Poolish ansetzen', s:'Hefe im Wasser auflösen, Mehl einrühren bis glatt. Abgedeckt 1 h bei Raumtemperatur.'});
+      steps.push({t:1, b:'Poolish in den Kühlschrank', s:`Verschlossen bei ${S.tf} °C.`, cls:'cold'});
+      steps.push({t:p.P-1, b:'Poolish raus', s:'Ca. 1 h akklimatisieren. Reif: Oberfläche voller Blasen, leicht gewölbt bis gerade einfallend.'});
+    } else {
+      steps.push({t:0, b:'Poolish ansetzen', s:`Hefe im Wasser auflösen, Mehl einrühren bis glatt. Abgedeckt bei ${fmt(S.rt,1)} °C reifen lassen (${dur(p.P)}). Reif: voller Blasen, Oberfläche beginnt leicht einzufallen.`});
+    }
+    const t0=p.P;
+    steps.push({t:t0, b:'Hauptteig mischen', s:'Poolish mit dem Hauptteig-Wasser lösen, Mehl nach und nach einarbeiten, nach 5 min Salz (und ggf. Öl) zugeben. Abgedeckt 20 min ruhen.'});
+    for (let i=1;i<=st.sf;i++) steps.push({t:t0+(20+(i-1)*25)/60, b:`Stretch & Fold ${i}/${st.sf}`, s: i===1?'Mit nassen Händen Teig hochziehen und überfalten, 4× rundum. Abdecken.':'Wie zuvor.'});
+    const sfEnd=t0+(20+(st.sf-1)*25)/60, ballAt=H-p.appretto;
+    steps.push({t:Math.max(ballAt,sfEnd+0.25), b:'Teiglinge formen', s:`${ballTxt} Endgare ${dur(H-Math.max(ballAt,sfEnd+0.25))} bei Raumtemperatur.`});
+  }
+  steps.push({t:H-1, b:'Ofen vorheizen', s: S.style==='neap'||S.style==='poolish' ? 'Auf volle Leistung (450 °C), Stein mind. 30–45 min durchheizen lassen.' : S.style==='roman' ? 'Auf ca. 350–380 °C (Steintemperatur messen).' : 'Auf ca. 320–350 °C (Steintemperatur messen).', cls:'hot'});
+  steps.push({t:H, b:'🍕 Pizzaabend', s:'Teiglinge mit reichlich Mehl (Semola) aus der Box lösen, von innen nach außen ausdrücken – Rand nicht plattdrücken.', cls:'hot'});
+  steps.sort((a,b)=>a.t-b.t);
+  $('timeline').innerHTML = steps.map(x=>{ const c=clock(x.t); return `<li class="${x.cls||''}"><div class="t">${c.t}<small>${c.day} · +${dur(x.t)==='0 min'?'0':dur(x.t)}</small></div><div class="d"><b>${x.b}</b><span>${x.s}</span></div></li>`; }).join('');
+}
+
+function renderTips(r){
+  const t = [
+    'Stretch & Fold: Hände anfeuchten statt bemehlen. Der Teig ist fertig, wenn er sich glatt anfühlt und eine dünne Haut ziehen lässt (Fenstertest).',
+    'Teigtemperatur nach dem Mischen messen – Ziel ca. '+(r.isP?r.st.ddt:(r.plan.fridge?r.st.ddt-2:r.st.ddt))+' °C. Die Wassertemperatur ist darauf ausgelegt.',
+    r.st.bake,
+  ];
+  if (S.style==='neap'||S.style==='poolish') t.push('Bei 450 °C reichen ein paar Blätter Basilikum und ein Schuss Öl nach dem Backen. Fior di Latte vorher abtropfen lassen.');
+  if (S.style==='roman') t.push('Für die typische Knusprigkeit ausrollen, sparsam belegen und eher etwas länger bei niedrigerer Hitze backen.');
+  if (S.style==='ny') t.push('Low-moisture Mozzarella verwenden, Sauce ungekocht. Pizza zum Essen in der Mitte falten.');
+  if (r.plan.fridge) t.push('Kühlschrank-Teig: Box geschlossen akklimatisieren lassen, sonst bildet sich eine trockene Haut.');
+  $('tips').innerHTML = t.map(x=>`<li>${x}</li>`).join('');
+}
+
+function syncTarget(){
+  const d=new Date(Date.now()+S.h*3600e3);
+  const p=n=>String(n).padStart(2,'0');
+  $('target').value = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function render(){
+  ['n','h','rt'].forEach(k=>{ if (document.activeElement!==$(k)) $(k).value=S[k]; });
+  if (document.activeElement!==$('target')) syncTarget();
+  $('hchips').innerHTML=[8,12,24,48,72].map(h=>`<button class="chip" data-h="${h}">${h} h</button>`).join('');
+  document.querySelectorAll('#yeastType button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===S.yeast));
+  renderStyles();
+  const r=compute();
+  renderRows(r); renderFridge(r); renderNotices(r); renderIngredients(r); renderTimeline(r); renderTips(r);
+  $('resetAll').disabled = Object.keys(S.ov).length===0;
+  save();
+}
+
+/* ---------- Events ---------- */
+const LIM = {n:[1,50], h:[3,120], rt:[14,32]};
+function setBase(k,v){ if (isNaN(v)) return; S[k]=clamp(v,...LIM[k]); render(); }
+
+document.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if (b.dataset.step){ const k=b.dataset.step, step=k==='h'&&S.h>=24?6:1; setBase(k, +S[k] + (+b.dataset.d)*step); }
+  else if (b.dataset.style){ if (S.style!==b.dataset.style){ S.style=b.dataset.style; S.ov={}; } render(); }
+  else if (b.dataset.h){ setBase('h', +b.dataset.h); }
+  else if (b.dataset.reset){ b.dataset.reset.split(',').forEach(k=>delete S.ov[k]); render(); }
+  else if (b.id==='resetAll'){ S.ov={}; render(); }
+  else if (b.parentElement.id==='yeastType'){
+    if (S.yeast!==b.dataset.v){ // überschriebenen Wert umrechnen
+      if (S.ov.yeast!==undefined) S.ov.yeast = +(b.dataset.v==='dry' ? S.ov.yeast/3 : S.ov.yeast*3).toPrecision(2);
+      S.yeast=b.dataset.v;
+    }
+    render();
+  }
+});
+
+document.addEventListener('input', e=>{
+  const el=e.target;
+  if (['n','h','rt'].includes(el.id)){ const v=parseFloat(el.value); if(!isNaN(v)&&v>=LIM[el.id][0]&&v<=LIM[el.id][1]){ S[el.id]=v; render(); } }
+  else if (el.dataset.k){
+    const v=parseFloat(String(el.value).replace(',','.')); if (isNaN(v)||v<0) return;
+    const sug=compute().sug[el.dataset.k];
+    if (Math.abs(v-sug) < 1e-9) delete S.ov[el.dataset.k]; else S.ov[el.dataset.k]=v;
+    render();
+  }
+  else if (el.id==='tf'){ const v=parseFloat(el.value); if(!isNaN(v)&&v>=1&&v<=12){ S.tf=v; render(); } }
+});
+
+document.addEventListener('change', e=>{
+  const el=e.target;
+  if (['n','h','rt'].includes(el.id)) setBase(el.id, parseFloat(el.value));
+  else if (el.id==='target'){
+    const t=new Date(el.value).getTime(); if(isNaN(t)) return;
+    setBase('h', Math.round((t-Date.now())/3600e3*2)/2);
+  }
+  else if (el.id==='fridge'){
+    const sugg=compute().fridgeSuggested;
+    if (el.checked===sugg) delete S.ov.fridge; else S.ov.fridge=el.checked;
+    render();
+  }
+  else if (el.dataset.toggle){
+    const k=el.dataset.toggle, st=STYLES[S.style];
+    if (el.checked===st.oilOn) delete S.ov[k]; else S.ov[k]=el.checked;
+    if (el.checked && !st.oilOn && S.ov.oil===undefined) S.ov.oil=3;
+    if (!el.checked) delete S.ov.oil;
+    render();
+  }
+  else if (el.dataset.k){ render(); }
+});
+
+document.addEventListener('focusout', e=>{ if (e.target.dataset && e.target.dataset.k) setTimeout(render,0); });
+
+render();
+setInterval(()=>{ if(!document.activeElement || document.activeElement===document.body) render(); }, 60000);
+})();
 </script>
-
 </body>
 </html>
