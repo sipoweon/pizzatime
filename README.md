@@ -1,4 +1,4 @@
-# Pizzateig-Rechner
+# Pizza Time – Pizzateig-Rechner
 
 WebApp zum Berechnen von Pizzateig für Hochtemperatur-Öfen (bis 450 °C) mit Stretch & Fold.
 
@@ -8,4 +8,4 @@ WebApp zum Berechnen von Pizzateig für Hochtemperatur-Öfen (bis 450 °C) mit S
 - Hefemenge (Frisch- oder Trockenhefe) aus Rezept, Temperatur und Zeit; Kühlschrankgare bei ausreichender Zeit
 - Zeitplan mit Uhrzeiten und Wassertemperatur
 
-Einfach `index.html` im Browser öffnen (keine Abhängigkeiten).
+Live: https://sipoweon.github.io/pizzatime/ – oder einfach `index.html` im Browser öffnen (keine Abhängigkeiten).
