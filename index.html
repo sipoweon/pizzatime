@@ -61,11 +61,15 @@ input[type=datetime-local]{width:100%;border:1px solid var(--line);border-radius
 .styleinfo{margin-top:12px;font-size:.86rem;color:var(--muted);display:grid;gap:3px}
 .styleinfo strong{color:var(--ink);font-weight:600}
 .rows{display:grid;gap:10px}
-.row{display:grid;grid-template-columns:1fr 150px 34px;align-items:center;gap:8px}
+.row{display:grid;grid-template-columns:1fr 172px 34px;align-items:center;gap:8px}
 .row .name{font-size:.95rem}
 .row .name small{display:block;color:var(--muted);font-size:.76rem}
 .row .in{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
-.row .in input{width:100%;border:0;background:transparent;color:var(--ink);font:600 1rem system-ui,sans-serif;padding:8px 6px 8px 10px;text-align:right}
+.row .in input{width:100%;min-width:0;border:0;background:transparent;color:var(--ink);font:600 1rem system-ui,sans-serif;padding:8px 2px;text-align:center;-moz-appearance:textfield}
+.row .in button{border:0;background:transparent;color:var(--ink);width:34px;align-self:stretch;font-size:1.15rem;cursor:pointer;flex:none}
+.row .in button:active{background:var(--chip)}
+.row .in button:disabled{cursor:default}
+@media (max-width:440px){.row{grid-template-columns:1fr 140px 28px;gap:6px}.row .in button{width:28px}.reset{width:28px}}
 .row.changed .in{border-color:var(--warn);background:var(--warn-soft)}
 .reset{border:0;background:transparent;color:var(--warn);font-size:1.1rem;cursor:pointer;visibility:hidden;width:34px;height:34px;border-radius:8px}
 .row.changed .reset{visibility:visible}
@@ -121,7 +125,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
         <div class="stepper"><button data-step="n" data-d="-1" aria-label="weniger">−</button><input id="n" type="number" inputmode="numeric" min="1" max="50"><button data-step="n" data-d="1" aria-label="mehr">+</button></div>
       </div>
       <div>
-        <label class="f" for="h">Dauer bis Pizzaabend</label>
+        <label class="f" for="h">Gesamtzeit</label>
         <div class="stepper"><button data-step="h" data-d="-1" aria-label="weniger">−</button><input id="h" type="number" inputmode="decimal" min="3" max="120" step="0.5"><span class="unit">h</span><button data-step="h" data-d="1" aria-label="mehr">+</button></div>
         <div class="chips" id="hchips"></div>
       </div>
@@ -353,8 +357,8 @@ function renderStyles(){
 }
 
 const ROWS = [
-  {k:'hyd', name:'Hydration', unit:'%', step:0.5, dec:1, help:'Wasser bezogen auf Mehl'},
-  {k:'ball', name:'Teigling', unit:'g', step:5, dec:0, help:'Gewicht pro Pizza'},
+  {k:'hyd', name:'Hydration', unit:'%', step:1, dec:1, help:'Wasser bezogen auf Mehl'},
+  {k:'ball', name:'Teigling', unit:'g', step:10, dec:0, help:'Gewicht pro Pizza'},
   {k:'salt', name:'Salz', unit:'%', step:0.1, dec:1, help:'bezogen auf Mehl'},
   {k:'oil', name:'Olivenöl', unit:'%', step:0.5, dec:1, help:'bezogen auf Mehl', toggle:'oilOn'},
   {k:'poolish', name:'Poolish-Anteil', unit:'%', step:5, dec:0, help:'Anteil am Gesamtmehl (100 % Hydration)', only:'poolish'},
@@ -375,8 +379,8 @@ function renderRows(r){
     const disabled = x.toggle && !r.oilOn;
     const shown = x.k==='yeast' ? (+v).toFixed(v<0.1?3:2) : fmt(+v, x.dec).replace(/\./g,'').replace(',', '.');
     return `<div class="row ${changed?'changed':''}">
-      <div class="name">${name}<small>${help}${changed?` · Vorschlag: ${x.k==='yeast'? (+r.sug[x.k]).toString().replace('.',',') : fmt(r.sug[x.k],x.dec)} ${x.unit}`:''}</small></div>
-      <div class="in" style="${disabled?'opacity:.45':''}"><input type="number" inputmode="decimal" step="${x.step}" data-k="${x.k}" value="${shown}" ${disabled?'disabled':''}><span class="unit">${x.unit}&nbsp;</span></div>
+      <div class="name">${name}<small>${help}${changed?`<br>Vorschlag: ${x.k==='yeast'? (+r.sug[x.k]).toString().replace('.',',') : fmt(r.sug[x.k],x.dec)} ${x.unit}`:''}</small></div>
+      <div class="in" style="${disabled?'opacity:.45':''}"><button data-rstep="${x.k}" data-d="-1" aria-label="${x.name} weniger" ${disabled?'disabled':''}>−</button><input type="number" inputmode="decimal" step="${x.step}" data-k="${x.k}" value="${shown}" ${disabled?'disabled':''}><span class="unit">&nbsp;${x.unit}</span><button data-rstep="${x.k}" data-d="1" aria-label="${x.name} mehr" ${disabled?'disabled':''}>+</button></div>
       <button class="reset" data-reset="${x.k}${x.toggle?','+x.toggle:''}" title="Vorschlag wiederherstellen">↺</button>
     </div>`;
   }).join('');
@@ -550,7 +554,7 @@ function renderPlan(){
   $('targetWrap').style.display = planned ? '' : 'none';
   if (planned && document.activeElement!==$('target')) $('target').value = toLocal(S.target);
   const st=startMs(), end=st+S.h*3600e3;
-  $('plansum').innerHTML = `<div class="kpi"><div class="v">${planned?fmtDT(st):'jetzt'}</div><div class="l">Teig ansetzen</div></div><div class="kpi"><div class="v">${fmtDT(end)}</div><div class="l">Pizzaabend · ${fmt(S.h,S.h%1?1:0)} h Teigführung</div></div>`;
+  $('plansum').innerHTML = `<div class="kpi"><div class="v">${planned?fmtDT(st):'jetzt'}</div><div class="l">Teig ansetzen</div></div><div class="kpi"><div class="v">${fmtDT(end)}</div><div class="l">Pizzaabend · ${fmt(S.h,S.h%1?1:0)} h Gesamtzeit</div></div>`;
   let n='';
   if (planned && st < Date.now()-5*60e3){
     const avail = Math.floor((S.target-Date.now())/1800e3)/2;
@@ -572,11 +576,24 @@ function render(){
 
 /* ---------- Events ---------- */
 const LIM = {n:[1,50], h:[3,120], rt:[14,32]};
+const RLIM = {hyd:[45,90], ball:[100,600], salt:[0,5], oil:[0,15], poolish:[10,100], yeast:[0.001,5]};
+function stepRow(k, d){
+  const r=compute(), cur=+r.val(k), row=ROWS.find(x=>x.k===k);
+  let v;
+  if (k==='yeast'){ // relativ ±5 %, auf 2 signifikante Stellen
+    v=+(cur*(d>0?1.05:0.95)).toPrecision(2);
+    if (v===cur){ const u=Math.pow(10,Math.floor(Math.log10(cur))-1); v=+(cur+d*u).toPrecision(2); }
+  } else v=Math.round((cur+d*row.step)/row.step)*row.step;
+  v=+clamp(v,...RLIM[k]).toFixed(4);
+  if (Math.abs(v-r.sug[k])<1e-9) delete S.ov[k]; else S.ov[k]=v;
+  render();
+}
 function setBase(k,v){ if (isNaN(v)) return; S[k]=clamp(v,...LIM[k]); render(); }
 
 document.addEventListener('click', e=>{
   const b=e.target.closest('button'); if(!b) return;
-  if (b.dataset.step){ const k=b.dataset.step, step=k==='h'&&S.h>=24?6:1; setBase(k, +S[k] + (+b.dataset.d)*step); }
+  if (b.dataset.rstep){ stepRow(b.dataset.rstep, +b.dataset.d); }
+  else if (b.dataset.step){ const k=b.dataset.step, step=k==='h'&&S.h>=24?6:1; setBase(k, +S[k] + (+b.dataset.d)*step); }
   else if (b.dataset.style){ if (S.style!==b.dataset.style){ S.style=b.dataset.style; S.ov={}; } render(); }
   else if (b.dataset.h){ setBase('h', +b.dataset.h); }
   else if (b.dataset.reset){ b.dataset.reset.split(',').forEach(k=>delete S.ov[k]); render(); }
