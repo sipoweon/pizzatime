@@ -340,7 +340,7 @@ function title(p){
   const lead=(mains.length?mains:p.tops.map(n=>BY[n]).filter(i=>i.role!=='herb')).slice(0,2).map(i=>i.name.split(',')[0].split(' (')[0]);
   return lead.length ? `${prefix} · ${lead.join(' & ')}` : prefix;
 }
-function li(i){ return `<li><span class="dot" style="background:${DIETCOL[i.diet]}"></span><span>${i.name}${PREP[i.name]?`<span class="prep">${PREP[i.name]}</span>`:''}</span><small>${{base:'Basis',cheese:'Käse',main:'Hauptzutat',acc:'Akzent',herb:'Kraut',special:'Finish'}[i.role]}</small></li>`; }
+function li(i){ return `<li><span class="dot" style="background:${DIETCOL[i.diet]}"></span><span>${i.name}${PREP[i.name]?`<span class="prep">${PREP[i.name]}</span>`:''}</span><small>${{base:'Basis',cheese:'Käse',main:'Hauptzutat',acc:'Akzent',herb:'Kräuter',special:'Finish'}[i.role]}</small></li>`; }
 function show(p){
   const items=p.tops.map(n=>BY[n]);
   const before=items.filter(i=>i.when==='b'), after=items.filter(i=>i.when==='a');
