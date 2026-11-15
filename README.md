@@ -8,4 +8,9 @@ WebApp zum Berechnen von Pizzateig für Hochtemperatur-Öfen (bis 450 °C) mit S
 - Hefemenge (Frisch- oder Trockenhefe) aus Rezept, Temperatur und Zeit; Kühlschrankgare bei ausreichender Zeit
 - Zeitplan mit Uhrzeiten und Wassertemperatur
 
-Live: https://sipoweon.github.io/pizzatime/ – oder einfach `index.html` im Browser öffnen (keine Abhängigkeiten).
+Live: https://sipoweon.github.io/pizzatime/ (Teigrechner) und https://sipoweon.github.io/pizzatime/toppings.html (Topping-Generator).
+
+## Topping-Generator
+- Auswahl Vegan / Veggi / Alles und Anzahl Toppings (2–7)
+- Kombinationen nach dem Kontrast-Prinzip moderner Pizzerien plus Signature-Klassiker
+- Trennung „vor dem Backen“ / „nach dem Backen“ für 450 °C-Öfen

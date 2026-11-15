@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#a85a24">
+<title>Pizza Time Toppings</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-106 -128 214 238'><circle cx='0' cy='2' r='104' fill='%23d8d3ea'/><path d='M0,0 L0,-97 A97,97 0 0 1 74.3,-62.4 Z' fill='%23f9e4cc'/><path d='M0,-97 L0,-120 A120,120 0 0 1 91.9,-77.1 L74.3,-62.4 A97,97 0 0 0 0,-97 Z' fill='%23a85a24'/><path d='M0,0 L0,-120 A120,120 0 0 1 91.9,-77.1 Z' fill='none' stroke='%23111' stroke-width='5' stroke-linejoin='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+<style>
+.ctrl{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
+@media (max-width:560px){.ctrl{grid-template-columns:1fr}}
+.seg.full{display:flex}.seg.full button{flex:1}
+.gen{width:100%;margin-top:14px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:700 1.15rem system-ui,sans-serif;padding:14px;cursor:pointer;box-shadow:var(--shadow)}
+.gen:active{transform:scale(.99)}
+.pz-title{font:700 1.7rem/1.15 "Comic Neue","Comic Sans MS",cursive;margin:0 0 4px}
+.pz-insp{font-size:.85rem;color:var(--muted);margin:0 0 12px}
+.pz-insp b{color:var(--accent);font-weight:600}
+.phase{margin-top:12px}
+.phase h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 6px}
+.items{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.items li{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.items li .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.items li small{color:var(--muted);margin-left:auto;font-size:.76rem;text-align:right}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.tag{background:var(--chip);border-radius:999px;padding:3px 10px;font-size:.78rem}
+.hist{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.hist li button{width:100%;text-align:left;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.9rem;padding:6px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.hist li button span{color:var(--muted);font-size:.8rem;display:block}
+.fade{animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><svg class="logo" viewBox="-106 -128 214 238" aria-hidden="true"><circle cx="0" cy="2" r="104" fill="var(--lav,#d8d3ea)"/><path d="M0,0 L0,-97 A97,97 0 0 1 74.3,-62.4 Z" fill="#f9e4cc"/><path d="M0,-97 L0,-120 A120,120 0 0 1 91.9,-77.1 L74.3,-62.4 A97,97 0 0 0 0,-97 Z" fill="#a85a24"/><path d="M74.3,-62.4 A97,97 0 0 0 0,-97" fill="none" stroke="#111" stroke-width="4"/><path d="M0,0 L0,-120 A120,120 0 0 1 91.9,-77.1 Z" fill="none" stroke="#111" stroke-width="5" stroke-linejoin="round"/></svg><span class="brand">Pizza Time!</span></h1>
+    <p><b style="color:var(--ink)">Topping-Generator</b> im Stil der Pizza contemporanea</p>
+  </header>
+  <nav class="nav"><a href="./">🧮 Teigrechner</a><a href="toppings.html" aria-current="page">🎲 Toppings</a></nav>
+
+  <section class="card">
+    <h2>Auswahl</h2>
+    <div class="ctrl">
+      <div>
+        <label class="f">Ernährung</label>
+        <div class="seg full" id="diet"><button data-v="v">🌱 Vegan</button><button data-v="g">🧀 Veggi</button><button data-v="m">🍖 Alles</button></div>
+      </div>
+      <div>
+        <label class="f" for="k">Anzahl Toppings <span style="font-size:.75rem">(ohne Sauce)</span></label>
+        <div class="stepper"><button data-step="-1" aria-label="weniger">−</button><input id="k" type="number" inputmode="numeric" min="2" max="7" readonly><button data-step="1" aria-label="mehr">+</button></div>
+      </div>
+    </div>
+    <button class="gen" id="gen">🎲 Neue Pizza</button>
+  </section>
+
+  <section class="card" id="result"></section>
+
+  <section class="card" id="histCard" hidden>
+    <h2>Zuletzt generiert</h2>
+    <ul class="hist" id="hist"></ul>
+  </section>
+
+  <footer>Kombiniert nach Kontrast-Prinzip der modernen Pizzerien: eine cremige oder würzige Basis, ein Gegenpol aus Säure, Frische oder Bitterkeit, dazu etwas Knuspriges. Empfindliche Zutaten kommen bei 450 °C erst nach dem Backen drauf.</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+/* Zutaten: [Name, Diät (v=vegan, g=vegetarisch, m=Fleisch/Fisch), Rolle, wann (b=vor dem Backen, a=nach dem Backen), Geschmacksprofil] */
+const DB = [
+  // Basis
+  ['Pomodoro (San Marzano)','v','base','b','acid'],
+  ['Gelbe Datterini-Tomaten','v','base','b','sweet acid'],
+  ['Bianca – ohne Tomate','v','base','b',''],
+  ['Kürbiscreme','v','base','b','sweet rich'],
+  ['Zucchinicreme','v','base','b','fresh'],
+  ['Pistaziencreme','v','base','b','rich nut'],
+  ['Friarielli-Creme','v','base','b','bitter'],
+  // Käse
+  ['Fior di Latte','g','cheese','b','rich'],
+  ['Büffelmozzarella','g','cheese','b','rich'],
+  ['Provola (geräuchert)','g','cheese','b','rich smoke'],
+  ['Stracciatella','g','cheese','a','rich fresh'],
+  ['Burrata','g','cheese','a','rich fresh'],
+  ['Gorgonzola dolce','g','cheese','b','rich salt strong'],
+  ['Pecorino Romano','g','cheese','a','salt strong'],
+  ['Parmigiano Reggiano','g','cheese','a','salt umami'],
+  ['Ricotta','g','cheese','a','fresh rich'],
+  ['Taleggio','g','cheese','b','rich strong'],
+  ['Vegane Cashew-Mozzarella','V','cheese','b','rich'],
+  ['Cashew-Stracciatella','V','cheese','a','rich fresh'],
+  ['Mandel-„Parmesan“','V','cheese','a','salt crunch'],
+  // Hauptzutaten
+  ['Salsiccia','m','main','b','rich salt'],
+  ['Mortadella','m','main','a','rich salt'],
+  ['Prosciutto crudo','m','main','a','salt'],
+  ['ʼNduja','m','main','b','heat rich'],
+  ['Guanciale','m','main','b','rich salt crunch'],
+  ['Sardellen aus Cetara','m','main','a','salt umami fish'],
+  ['Speck','m','main','a','smoke salt'],
+  ['Coppa','m','main','a','salt rich'],
+  ['Scharfe Salami (Spianata)','m','main','b','heat salt'],
+  ['Friarielli','v','main','b','bitter'],
+  ['Steinpilze','v','main','b','umami'],
+  ['Geröstete Paprika','v','main','b','sweet smoke'],
+  ['Frittierte Aubergine','v','main','b','rich'],
+  ['Zucchini','v','main','b','fresh'],
+  ['Artischocken','v','main','b','bitter acid'],
+  ['Kartoffeln, hauchdünn','v','main','b','rich'],
+  ['Kürbis, geröstet','v','main','b','sweet'],
+  ['Radicchio','v','main','b','bitter'],
+  ['Karamellisierte Zwiebeln','v','main','b','sweet'],
+  ['Fenchel','v','main','b','fresh sweet'],
+  ['Rote Zwiebel','v','main','b','sweet acid'],
+  ['Grüner Spargel','v','main','b','fresh'],
+  ['Zucchiniblüten','v','main','b','fresh'],
+  ['Kirschtomaten','v','main','b','sweet acid'],
+  // Akzente
+  ['Kapern','v','acc','b','acid salt'],
+  ['Taggiasca-Oliven','v','acc','b','salt'],
+  ['Pistazien, gehackt','v','acc','a','crunch nut'],
+  ['Walnüsse','v','acc','a','crunch nut bitter'],
+  ['Haselnüsse','v','acc','a','crunch nut'],
+  ['Pinienkerne','v','acc','a','crunch nut'],
+  ['Frische Feigen','v','acc','a','sweet'],
+  ['Birne','v','acc','b','sweet fresh'],
+  ['Getrocknete Tomaten','v','acc','b','sweet acid umami'],
+  ['Confit-Kirschtomaten','v','acc','b','sweet acid'],
+  ['Kalabrische Chili','v','acc','b','heat'],
+  ['Chili-Honig','g','acc','a','sweet heat'],
+  ['Honig','g','acc','a','sweet'],
+  ['Zitronenzeste','v','acc','a','acid fresh'],
+  ['Trüffel','v','acc','a','umami rich'],
+  ['Balsamico-Reduktion','v','acc','a','sweet acid'],
+  ['Pistazienpesto','v','acc','a','rich nut'],
+  ['Basilikumpesto','g','acc','a','fresh'],
+  ['Knoblauch-Confit','v','acc','b','sweet'],
+  ['Knoblauch','v','acc','b','heat'],
+  ['Rucola','v','acc','a','bitter fresh'],
+  ['Geröstete Brotbrösel','v','acc','a','crunch'],
+  ['Eingelegte rote Zwiebeln','v','acc','a','acid crunch'],
+  ['Salzzitrone','v','acc','a','acid salt'],
+  // Kräuter
+  ['Basilikum','v','herb','a','fresh'],
+  ['Salbei','v','herb','b','fresh'],
+  ['Rosmarin','v','herb','b','fresh'],
+  ['Thymian','v','herb','b','fresh'],
+  ['Oregano','v','herb','b','fresh'],
+  ['Minze','v','herb','a','fresh'],
+  // nur für Signature-Pizzen
+  ['Rohes Tomatenpüree (Streifen)','v','special','a','acid fresh'],
+  ['Basilikum-Reduktion','v','special','a','fresh'],
+].map(([name,diet,role,when,tags])=>({name,diet:diet.toLowerCase(),veganAlt:diet==='V',role,when,tags:tags?tags.split(' '):[]}));
+const BY = Object.fromEntries(DB.map(x=>[x.name,x]));
+
+/* Signature- und Klassiker-Kombinationen: [Inspiration, Basis, Toppings…] */
+const SIGS = [
+  ['Pizzeria Bianco, Phoenix – „Rosa“','Bianca – ohne Tomate','Rote Zwiebel','Parmigiano Reggiano','Rosmarin','Pistazien, gehackt'],
+  ['Robertaʼs, Brooklyn – „Bee Sting“','Pomodoro (San Marzano)','Fior di Latte','Scharfe Salami (Spianata)','Kalabrische Chili','Honig'],
+  ['Franco Pepe, Caiazzo – „Margherita sbagliata“','Bianca – ohne Tomate','Büffelmozzarella','Rohes Tomatenpüree (Streifen)','Basilikum-Reduktion'],
+  ['Una Pizza Napoletana, New York – „Filetti“','Bianca – ohne Tomate','Kirschtomaten','Büffelmozzarella','Knoblauch','Basilikum'],
+  ['Klassiker der Pizza contemporanea','Bianca – ohne Tomate','Fior di Latte','Mortadella','Stracciatella','Pistazien, gehackt'],
+  ['Klassiker aus Neapel','Bianca – ohne Tomate','Provola (geräuchert)','Salsiccia','Friarielli'],
+  ['Klassiker aus Neapel','Bianca – ohne Tomate','Provola (geräuchert)','Salsiccia','Friarielli','Kalabrische Chili'],
+  ['Klassiker der Pizza contemporanea','Bianca – ohne Tomate','Provola (geräuchert)','Kartoffeln, hauchdünn','Rosmarin'],
+  ['Klassiker der Pizza contemporanea','Bianca – ohne Tomate','Provola (geräuchert)','Kartoffeln, hauchdünn','Guanciale','Rosmarin'],
+  ['Herbst-Klassiker','Kürbiscreme','Provola (geräuchert)','Salsiccia','Salbei','Haselnüsse'],
+  ['Marinara, neu gedacht','Pomodoro (San Marzano)','Knoblauch-Confit','Sardellen aus Cetara','Kapern','Oregano'],
+  ['Marinara','Pomodoro (San Marzano)','Knoblauch','Oregano','Basilikum'],
+  ['Klassiker der Pizza contemporanea','Pomodoro (San Marzano)','Fior di Latte','ʼNduja','Stracciatella','Honig'],
+  ['Küste Amalfi','Gelbe Datterini-Tomaten','Fior di Latte','Sardellen aus Cetara','Taggiasca-Oliven','Zitronenzeste'],
+  ['Parmigiana, vegan','Pomodoro (San Marzano)','Frittierte Aubergine','Cashew-Stracciatella','Mandel-„Parmesan“','Basilikum'],
+  ['Frühling, vegan','Zucchinicreme','Zucchini','Minze','Zitronenzeste','Pinienkerne'],
+  ['Bitter & süß','Bianca – ohne Tomate','Gorgonzola dolce','Radicchio','Walnüsse','Honig'],
+  ['Sommer-Klassiker','Gelbe Datterini-Tomaten','Burrata','Basilikum','Zitronenzeste'],
+  ['Bianca, vegan','Bianca – ohne Tomate','Kartoffeln, hauchdünn','Rosmarin','Knoblauch-Confit','Taggiasca-Oliven'],
+  ['Crudo-Klassiker','Pomodoro (San Marzano)','Fior di Latte','Kirschtomaten','Prosciutto crudo','Rucola','Parmigiano Reggiano'],
+].map(([insp,base,...tops])=>({insp,base,tops}));
+
+const AVOID = [['Sardellen aus Cetara','Gorgonzola dolce'],['Sardellen aus Cetara','Honig'],['Sardellen aus Cetara','Chili-Honig'],['Sardellen aus Cetara','Frische Feigen'],['Sardellen aus Cetara','Taleggio'],['Minze','Gorgonzola dolce'],['Trüffel','Kalabrische Chili'],['Trüffel','ʼNduja'],['Balsamico-Reduktion','Pomodoro (San Marzano)'],['Birne','Pomodoro (San Marzano)'],['Frische Feigen','Pomodoro (San Marzano)'],['Kürbiscreme','Kirschtomaten'],['Pistaziencreme','Pistazienpesto'],['Pistaziencreme','Pistazien, gehackt'],['Sardellen aus Cetara','Kürbiscreme'],['Sardellen aus Cetara','Pistaziencreme'],['Trüffel','Pomodoro (San Marzano)'],['Trüffel','Gelbe Datterini-Tomaten'],['Trüffel','Getrocknete Tomaten'],['Birne','Salsiccia'],['Minze','Salsiccia']];
+const avoidSet = new Set(AVOID.flatMap(([a,b])=>[a+'|'+b,b+'|'+a]));
+
+const LABEL = {rich:'cremig',acid:'säuerlich',fresh:'frisch',bitter:'herb',crunch:'knusprig',sweet:'süß',salt:'würzig',heat:'scharf',smoke:'rauchig',umami:'umami',nut:'nussig',strong:'kräftig',fish:'Meer'};
+const DIETCOL = {v:'#5f9a4f',g:'#d9a441',m:'#b4513a'};
+
+/* ---------- State ---------- */
+let S = {diet:'m', k:4, hist:[]};
+try{ const s=JSON.parse(localStorage.getItem('pizzatime-toppings')); if(s) S=Object.assign(S,s); }catch(e){}
+const save=()=>{ try{ localStorage.setItem('pizzatime-toppings', JSON.stringify(S)); }catch(e){} };
+const $=id=>document.getElementById(id);
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const allowed = x => x.veganAlt ? S.diet==='v' : S.diet==='m' || (S.diet==='g' ? x.diet!=='m' : x.diet==='v');
+const pool = role => DB.filter(x=>x.role===role && allowed(x));
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const key = p => [p.base,...[...p.tops].sort()].join('|');
+const recent = () => new Set(S.hist.slice(0,15).map(key));
+
+/* ---------- Generator ---------- */
+function draft(){
+  const k=S.k;
+  const base = rnd(pool('base').flatMap(b => b.name.startsWith('Pomodoro')||b.name.startsWith('Bianca') ? [b,b,b] : [b]));
+  const plan=[];
+  const wantCheese = S.diet!=='v' || Math.random()<0.7;
+  if (wantCheese) plan.push('cheese');
+  const mains = k>=5 ? 2 : (k>=3 ? (Math.random()<0.4?2:1) : 1);
+  for(let i=0;i<mains;i++) plan.push('main');
+  if (k>=3) plan.push('herb');
+  while(plan.length<k) plan.push('acc');
+  plan.length=k;
+  // Bei "Alles" überwiegend mit Fleisch/Fisch
+  const tops=[]; const used=new Set([base.name]);
+  for (const role of plan){
+    let cands = pool(role).filter(x=>!used.has(x.name));
+    if (role==='main' && S.diet==='m' && !tops.some(t=>t.diet==='m') && Math.random()<0.75) cands=cands.filter(x=>x.diet==='m');
+    if (role==='main' && tops.filter(t=>t.diet==='m').length>=1) cands=cands.filter(x=>x.diet!=='m' || Math.random()<0.3);
+    if (role==='cheese' && tops.some(t=>t.role==='cheese')) continue;
+    if (!cands.length) cands = pool('acc').filter(x=>!used.has(x.name));
+    const c=rnd(cands); tops.push(c); used.add(c.name);
+  }
+  return {base:base.name, tops:tops.map(t=>t.name)};
+}
+function score(p){
+  const items=[BY[p.base],...p.tops.map(n=>BY[n])];
+  const cnt={}; items.forEach(i=>i.tags.forEach(t=>cnt[t]=(cnt[t]||0)+1));
+  const has=t=>cnt[t]>0;
+  let s=0;
+  if (has('rich')) s+=1;
+  if (has('acid')||has('fresh')||has('bitter')) s+=2;
+  if (has('crunch')) s+=1;
+  if (has('sweet') && (has('salt')||has('heat'))) s+=1.5;
+  if (has('umami')) s+=.5;
+  if ((cnt.strong||0)>1) s-=3;
+  if ((cnt.nut||0)>1) s-=2;
+  if ((cnt.sweet||0)>2) s-=2;
+  if ((cnt.heat||0)>1) s-=1;
+  if ((cnt.smoke||0)>1) s-=1;
+  if ((cnt.umami||0)>2) s-=1.5;
+  if ((cnt.salt||0)>3) s-=1.5;
+  if (items.filter(i=>i.role==='cheese').length>1) s-=3;
+  if (items.filter(i=>i.diet==='m').length>2) s-=2;
+  const names=items.map(i=>i.name);
+  for (let i=0;i<names.length;i++) for (let j=i+1;j<names.length;j++) if (avoidSet.has(names[i]+'|'+names[j])) s-=6;
+  return s + Math.random()*1.5;
+}
+function generate(){
+  const rec=recent();
+  // Signature-Pizza, wenn passend
+  const sigs = SIGS.filter(sg=>sg.tops.length===S.k && [sg.base,...sg.tops].every(n=>allowed(BY[n])) && !rec.has(key(sg)));
+  if (sigs.length && Math.random()<0.3) return Object.assign({}, rnd(sigs));
+  let best=null, bs=-1e9;
+  for (let i=0;i<60;i++){
+    const p=draft(); if (p.tops.length!==S.k) continue;
+    const sc=score(p) - (rec.has(key(p))?10:0);
+    if (sc>bs){bs=sc;best=p;}
+  }
+  best.insp=null;
+  return best;
+}
+
+/* ---------- Anzeige ---------- */
+function title(p){
+  const b=p.base;
+  const prefix = b.startsWith('Pomodoro') ? 'Rossa' : b.startsWith('Bianca') ? 'Bianca' : b.startsWith('Gelbe') ? 'Gialla' : ({'Kürbiscreme':'Crema di Zucca','Zucchinicreme':'Crema di Zucchine','Pistaziencreme':'Crema di Pistacchio','Friarielli-Creme':'Crema di Friarielli'}[b]||b);
+  const mains=p.tops.map(n=>BY[n]).filter(i=>i.role==='main'||i.role==='special');
+  const lead=(mains.length?mains:p.tops.map(n=>BY[n]).filter(i=>i.role!=='herb')).slice(0,2).map(i=>i.name.split(',')[0].split(' (')[0]);
+  return lead.length ? `${prefix} · ${lead.join(' & ')}` : prefix;
+}
+function li(i){ return `<li><span class="dot" style="background:${DIETCOL[i.diet]}"></span>${i.name}<small>${{base:'Basis',cheese:'Käse',main:'Hauptzutat',acc:'Akzent',herb:'Kraut',special:'Finish'}[i.role]}</small></li>`; }
+function show(p){
+  const items=p.tops.map(n=>BY[n]);
+  const before=items.filter(i=>i.when==='b'), after=items.filter(i=>i.when==='a');
+  const cnt={}; [BY[p.base],...items].forEach(i=>i.tags.forEach(t=>cnt[t]=(cnt[t]||0)+1));
+  const tags=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([t])=>LABEL[t]).filter(Boolean).slice(0,6);
+  const diet = items.concat(BY[p.base]).some(i=>i.diet==='m') ? '🍖 mit Fleisch/Fisch' : items.some(i=>i.diet==='g') ? '🧀 vegetarisch' : '🌱 vegan';
+  $('result').innerHTML = `<div class="fade">
+    <h2>Vorschlag <span style="text-transform:none;letter-spacing:0">${diet}</span></h2>
+    <p class="pz-title">${title(p)}</p>
+    <p class="pz-insp">${p.insp?`Inspiriert von <b>${p.insp}</b>`:'Neue Kombination nach dem Kontrast-Prinzip'}</p>
+    <div class="phase"><h3>Basis</h3><ul class="items">${li(BY[p.base])}</ul></div>
+    ${before.length?`<div class="phase"><h3>🔥 Vor dem Backen</h3><ul class="items">${before.map(li).join('')}</ul></div>`:''}
+    ${after.length?`<div class="phase"><h3>✨ Nach dem Backen</h3><ul class="items">${after.map(li).join('')}</ul></div>`:''}
+    <div class="tags">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}<span class="tag">+ Olivenöl extra vergine</span></div>
+  </div>`;
+}
+function renderHist(){
+  $('histCard').hidden = S.hist.length<2;
+  $('hist').innerHTML = S.hist.slice(1,8).map((p,i)=>`<li><button data-hist="${i+1}">${title(p)}<span>${[p.base,...p.tops].join(' · ')}</span></button></li>`).join('');
+}
+function renderCtrl(){
+  document.querySelectorAll('#diet button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===S.diet));
+  $('k').value=S.k;
+}
+function next(){
+  const p=generate(); S.hist.unshift(p); S.hist=S.hist.slice(0,30); save(); show(p); renderHist();
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if (b.id==='gen') next();
+  else if (b.dataset.step){ S.k=Math.min(7,Math.max(2,S.k+ +b.dataset.step)); renderCtrl(); next(); }
+  else if (b.parentElement.id==='diet'){ S.diet=b.dataset.v; renderCtrl(); next(); }
+  else if (b.dataset.hist){ const p=S.hist.splice(+b.dataset.hist,1)[0]; S.hist.unshift(p); save(); show(p); renderHist(); }
+});
+
+renderCtrl();
+if (S.hist.length && S.hist[0].tops.every(n=>BY[n])) { show(S.hist[0]); renderHist(); } else next();
+})();
+</script>
+</body>
+</html>
