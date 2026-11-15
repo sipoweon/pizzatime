@@ -75,11 +75,12 @@ const DB = [
   // Basis
   ['Pomodoro (San Marzano)','v','base','b','acid'],
   ['Gelbe Datterini-Tomaten','v','base','b','sweet acid'],
-  ['Bianca – ohne Tomate','v','base','b',''],
+  ['Bianca (Olivenöl & Meersalz)','v','base','b',''],
   ['Kürbiscreme','v','base','b','sweet rich'],
   ['Zucchinicreme','v','base','b','fresh'],
   ['Pistaziencreme','v','base','b','rich nut'],
   ['Friarielli-Creme','v','base','b','bitter'],
+  ['Ricotta-Creme','g','base','b','fresh rich'],
   // Käse
   ['Fior di Latte','g','cheese','b','rich'],
   ['Büffelmozzarella','g','cheese','b','rich'],
@@ -156,18 +157,28 @@ const DB = [
   ['Basilikum-Reduktion','v','special','a','fresh'],
 ].map(([name,diet,role,when,tags])=>({name,diet:diet.toLowerCase(),veganAlt:diet==='V',role,when,tags:tags?tags.split(' '):[]}));
 const BY = Object.fromEntries(DB.map(x=>[x.name,x]));
+const BASEDESC = {
+  'Pomodoro (San Marzano)':'Geschälte San-Marzano-Tomaten von Hand zerdrücken, Prise Salz – nicht kochen. Dünn auftragen.',
+  'Gelbe Datterini-Tomaten':'Gelbe Datterini (Glas/Dose) grob zerdrücken, Prise Salz. Süßer und milder als rote Tomaten.',
+  'Bianca (Olivenöl & Meersalz)':'Keine Sauce: Teig mit Olivenöl beträufeln, Prise Meersalz. Der Käse (z. B. Fior di Latte oder Provola) bildet die Grundlage – vegan nur Öl, ggf. etwas Knoblauch.',
+  'Kürbiscreme':'Hokkaido in Stücken rösten, mit Olivenöl, Salz und etwas Wasser fein pürieren.',
+  'Zucchinicreme':'Zucchini kurz anbraten, mit Basilikum oder Minze, Olivenöl und Salz pürieren.',
+  'Pistaziencreme':'Ungesalzene Pistazien mit Olivenöl, etwas Wasser und Salz fein mixen. Dünn auftragen.',
+  'Friarielli-Creme':'Friarielli (Stängelkohl) mit Knoblauch und Chili anbraten, mit Olivenöl pürieren.',
+  'Ricotta-Creme':'Ricotta mit Zitronenabrieb, Salz, Pfeffer und einem Schuss Olivenöl glatt rühren.',
+};
 
 /* Signature- und Klassiker-Kombinationen: [Inspiration, Basis, Toppings…] */
 const SIGS = [
-  ['Pizzeria Bianco, Phoenix – „Rosa“','Bianca – ohne Tomate','Rote Zwiebel','Parmigiano Reggiano','Rosmarin','Pistazien, gehackt'],
+  ['Pizzeria Bianco, Phoenix – „Rosa“','Bianca (Olivenöl & Meersalz)','Rote Zwiebel','Parmigiano Reggiano','Rosmarin','Pistazien, gehackt'],
   ['Robertaʼs, Brooklyn – „Bee Sting“','Pomodoro (San Marzano)','Fior di Latte','Scharfe Salami (Spianata)','Kalabrische Chili','Honig'],
-  ['Franco Pepe, Caiazzo – „Margherita sbagliata“','Bianca – ohne Tomate','Büffelmozzarella','Rohes Tomatenpüree (Streifen)','Basilikum-Reduktion'],
-  ['Una Pizza Napoletana, New York – „Filetti“','Bianca – ohne Tomate','Kirschtomaten','Büffelmozzarella','Knoblauch','Basilikum'],
-  ['Klassiker der Pizza contemporanea','Bianca – ohne Tomate','Fior di Latte','Mortadella','Stracciatella','Pistazien, gehackt'],
-  ['Klassiker aus Neapel','Bianca – ohne Tomate','Provola (geräuchert)','Salsiccia','Friarielli'],
-  ['Klassiker aus Neapel','Bianca – ohne Tomate','Provola (geräuchert)','Salsiccia','Friarielli','Kalabrische Chili'],
-  ['Klassiker der Pizza contemporanea','Bianca – ohne Tomate','Provola (geräuchert)','Kartoffeln, hauchdünn','Rosmarin'],
-  ['Klassiker der Pizza contemporanea','Bianca – ohne Tomate','Provola (geräuchert)','Kartoffeln, hauchdünn','Guanciale','Rosmarin'],
+  ['Franco Pepe, Caiazzo – „Margherita sbagliata“','Bianca (Olivenöl & Meersalz)','Büffelmozzarella','Rohes Tomatenpüree (Streifen)','Basilikum-Reduktion'],
+  ['Una Pizza Napoletana, New York – „Filetti“','Bianca (Olivenöl & Meersalz)','Kirschtomaten','Büffelmozzarella','Knoblauch','Basilikum'],
+  ['Klassiker der Pizza contemporanea','Bianca (Olivenöl & Meersalz)','Fior di Latte','Mortadella','Stracciatella','Pistazien, gehackt'],
+  ['Klassiker aus Neapel','Bianca (Olivenöl & Meersalz)','Provola (geräuchert)','Salsiccia','Friarielli'],
+  ['Klassiker aus Neapel','Bianca (Olivenöl & Meersalz)','Provola (geräuchert)','Salsiccia','Friarielli','Kalabrische Chili'],
+  ['Klassiker der Pizza contemporanea','Bianca (Olivenöl & Meersalz)','Provola (geräuchert)','Kartoffeln, hauchdünn','Rosmarin'],
+  ['Klassiker der Pizza contemporanea','Bianca (Olivenöl & Meersalz)','Provola (geräuchert)','Kartoffeln, hauchdünn','Guanciale','Rosmarin'],
   ['Herbst-Klassiker','Kürbiscreme','Provola (geräuchert)','Salsiccia','Salbei','Haselnüsse'],
   ['Marinara, neu gedacht','Pomodoro (San Marzano)','Knoblauch-Confit','Sardellen aus Cetara','Kapern','Oregano'],
   ['Marinara','Pomodoro (San Marzano)','Knoblauch','Oregano','Basilikum'],
@@ -175,13 +186,13 @@ const SIGS = [
   ['Küste Amalfi','Gelbe Datterini-Tomaten','Fior di Latte','Sardellen aus Cetara','Taggiasca-Oliven','Zitronenzeste'],
   ['Parmigiana, vegan','Pomodoro (San Marzano)','Frittierte Aubergine','Cashew-Stracciatella','Mandel-„Parmesan“','Basilikum'],
   ['Frühling, vegan','Zucchinicreme','Zucchini','Minze','Zitronenzeste','Pinienkerne'],
-  ['Bitter & süß','Bianca – ohne Tomate','Gorgonzola dolce','Radicchio','Walnüsse','Honig'],
+  ['Bitter & süß','Bianca (Olivenöl & Meersalz)','Gorgonzola dolce','Radicchio','Walnüsse','Honig'],
   ['Sommer-Klassiker','Gelbe Datterini-Tomaten','Burrata','Basilikum','Zitronenzeste'],
-  ['Bianca, vegan','Bianca – ohne Tomate','Kartoffeln, hauchdünn','Rosmarin','Knoblauch-Confit','Taggiasca-Oliven'],
+  ['Bianca, vegan','Bianca (Olivenöl & Meersalz)','Kartoffeln, hauchdünn','Rosmarin','Knoblauch-Confit','Taggiasca-Oliven'],
   ['Crudo-Klassiker','Pomodoro (San Marzano)','Fior di Latte','Kirschtomaten','Prosciutto crudo','Rucola','Parmigiano Reggiano'],
 ].map(([insp,base,...tops])=>({insp,base,tops}));
 
-const AVOID = [['Sardellen aus Cetara','Gorgonzola dolce'],['Sardellen aus Cetara','Honig'],['Sardellen aus Cetara','Chili-Honig'],['Sardellen aus Cetara','Frische Feigen'],['Sardellen aus Cetara','Taleggio'],['Minze','Gorgonzola dolce'],['Trüffel','Kalabrische Chili'],['Trüffel','ʼNduja'],['Balsamico-Reduktion','Pomodoro (San Marzano)'],['Birne','Pomodoro (San Marzano)'],['Frische Feigen','Pomodoro (San Marzano)'],['Kürbiscreme','Kirschtomaten'],['Pistaziencreme','Pistazienpesto'],['Pistaziencreme','Pistazien, gehackt'],['Sardellen aus Cetara','Kürbiscreme'],['Sardellen aus Cetara','Pistaziencreme'],['Trüffel','Pomodoro (San Marzano)'],['Trüffel','Gelbe Datterini-Tomaten'],['Trüffel','Getrocknete Tomaten'],['Birne','Salsiccia'],['Minze','Salsiccia']];
+const AVOID = [['Sardellen aus Cetara','Gorgonzola dolce'],['Sardellen aus Cetara','Honig'],['Sardellen aus Cetara','Chili-Honig'],['Sardellen aus Cetara','Frische Feigen'],['Sardellen aus Cetara','Taleggio'],['Minze','Gorgonzola dolce'],['Trüffel','Kalabrische Chili'],['Trüffel','ʼNduja'],['Balsamico-Reduktion','Pomodoro (San Marzano)'],['Birne','Pomodoro (San Marzano)'],['Frische Feigen','Pomodoro (San Marzano)'],['Kürbiscreme','Kirschtomaten'],['Pistaziencreme','Pistazienpesto'],['Pistaziencreme','Pistazien, gehackt'],['Ricotta-Creme','Ricotta'],['Ricotta-Creme','Burrata'],['Ricotta-Creme','Stracciatella'],['Ricotta-Creme','Gorgonzola dolce'],['Sardellen aus Cetara','Kürbiscreme'],['Sardellen aus Cetara','Pistaziencreme'],['Trüffel','Pomodoro (San Marzano)'],['Trüffel','Gelbe Datterini-Tomaten'],['Trüffel','Getrocknete Tomaten'],['Birne','Salsiccia'],['Minze','Salsiccia']];
 const avoidSet = new Set(AVOID.flatMap(([a,b])=>[a+'|'+b,b+'|'+a]));
 
 const LABEL = {rich:'cremig',acid:'säuerlich',fresh:'frisch',bitter:'herb',crunch:'knusprig',sweet:'süß',salt:'würzig',heat:'scharf',smoke:'rauchig',umami:'umami',nut:'nussig',strong:'kräftig',fish:'Meer'};
@@ -264,7 +275,7 @@ function generate(){
 /* ---------- Anzeige ---------- */
 function title(p){
   const b=p.base;
-  const prefix = b.startsWith('Pomodoro') ? 'Rossa' : b.startsWith('Bianca') ? 'Bianca' : b.startsWith('Gelbe') ? 'Gialla' : ({'Kürbiscreme':'Crema di Zucca','Zucchinicreme':'Crema di Zucchine','Pistaziencreme':'Crema di Pistacchio','Friarielli-Creme':'Crema di Friarielli'}[b]||b);
+  const prefix = b.startsWith('Pomodoro') ? 'Rossa' : b.startsWith('Bianca') ? 'Bianca' : b.startsWith('Gelbe') ? 'Gialla' : ({'Ricotta-Creme':'Crema di Ricotta','Kürbiscreme':'Crema di Zucca','Zucchinicreme':'Crema di Zucchine','Pistaziencreme':'Crema di Pistacchio','Friarielli-Creme':'Crema di Friarielli'}[b]||b);
   const mains=p.tops.map(n=>BY[n]).filter(i=>i.role==='main'||i.role==='special');
   const lead=(mains.length?mains:p.tops.map(n=>BY[n]).filter(i=>i.role!=='herb')).slice(0,2).map(i=>i.name.split(',')[0].split(' (')[0]);
   return lead.length ? `${prefix} · ${lead.join(' & ')}` : prefix;
@@ -280,7 +291,7 @@ function show(p){
     <h2>Vorschlag <span style="text-transform:none;letter-spacing:0">${diet}</span></h2>
     <p class="pz-title">${title(p)}</p>
     <p class="pz-insp">${p.insp?`Inspiriert von <b>${p.insp}</b>`:'Neue Kombination nach dem Kontrast-Prinzip'}</p>
-    <div class="phase"><h3>Basis</h3><ul class="items">${li(BY[p.base])}</ul></div>
+    <div class="phase"><h3>Basis</h3><ul class="items">${li(BY[p.base])}</ul>${BASEDESC[p.base]?`<p class="sub" style="margin:6px 2px 0">${BASEDESC[p.base]}</p>`:''}</div>
     ${before.length?`<div class="phase"><h3>🔥 Vor dem Backen</h3><ul class="items">${before.map(li).join('')}</ul></div>`:''}
     ${after.length?`<div class="phase"><h3>✨ Nach dem Backen</h3><ul class="items">${after.map(li).join('')}</ul></div>`:''}
     <div class="tags">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}<span class="tag">+ Olivenöl extra vergine</span></div>
@@ -307,7 +318,8 @@ document.addEventListener('click',e=>{
 });
 
 renderCtrl();
-if (S.hist.length && S.hist[0].tops.every(n=>BY[n])) { show(S.hist[0]); renderHist(); } else next();
+S.hist = S.hist.filter(p=>BY[p.base] && p.tops.every(n=>BY[n]));
+if (S.hist.length) { show(S.hist[0]); renderHist(); } else next();
 })();
 </script>
 </body>
