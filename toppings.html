@@ -134,7 +134,7 @@ const DB = [
   ['Getrocknete Tomaten','v','acc','b','sweet acid umami'],
   ['Confit-Kirschtomaten','v','acc','b','sweet acid'],
   ['Kalabrische Chili','v','acc','b','heat'],
-  ['Chili-Honig','g','acc','a','sweet heat'],
+  ['Hot Honey (Chili-Honig)','g','acc','a','sweet heat'],
   ['Honig','g','acc','a','sweet'],
   ['Zitronenzeste','v','acc','a','acid fresh'],
   ['Trüffel','v','acc','a','umami rich'],
@@ -202,7 +202,7 @@ const PREP = {
 "Getrocknete Tomaten": "In Öl eingelegte abtropfen lassen, in Streifen schneiden.",
 "Confit-Kirschtomaten": "Mit Olivenöl, Salz, Zucker und Thymian bei 120 °C ca. 1,5 h im Ofen confieren.",
 "Kalabrische Chili": "In Öl eingelegt oder frisch in feinen Ringen.",
-"Chili-Honig": "Honig mit Chiliflocken kurz erwärmen und ziehen lassen.",
+"Hot Honey (Chili-Honig)": "Honig mit Chiliflocken kurz erwärmen und ziehen lassen.",
 "Trüffel": "Frisch hobeln, oder Trüffelcreme in kleinen Tupfen.",
 "Balsamico-Reduktion": "Aceto balsamico einkochen, bis er sirupartig ist – sparsam verwenden.",
 "Pistazienpesto": "Pistazien, Olivenöl, Salz (und ggf. Parmesan) mixen.",
@@ -252,7 +252,7 @@ const SIGS = [
   ['Crudo-Klassiker','Pomodoro (San Marzano)','Fior di Latte','Kirschtomaten','Prosciutto crudo','Rucola','Parmigiano Reggiano'],
 ].map(([insp,base,...tops])=>({insp,base,tops}));
 
-const AVOID = [['Sardellen aus Cetara','Gorgonzola dolce'],['Sardellen aus Cetara','Honig'],['Sardellen aus Cetara','Chili-Honig'],['Sardellen aus Cetara','Frische Feigen'],['Sardellen aus Cetara','Taleggio'],['Minze','Gorgonzola dolce'],['Trüffel','Kalabrische Chili'],['Trüffel','ʼNduja'],['Balsamico-Reduktion','Pomodoro (San Marzano)'],['Birne','Pomodoro (San Marzano)'],['Frische Feigen','Pomodoro (San Marzano)'],['Kürbiscreme','Kirschtomaten'],['Pistaziencreme','Pistazienpesto'],['Pistaziencreme','Pistazien, gehackt'],['Ricotta-Creme','Ricotta'],['Ricotta-Creme','Burrata'],['Ricotta-Creme','Stracciatella'],['Ricotta-Creme','Gorgonzola dolce'],['Sardellen aus Cetara','Kürbiscreme'],['Sardellen aus Cetara','Pistaziencreme'],['Trüffel','Pomodoro (San Marzano)'],['Trüffel','Gelbe Datterini-Tomaten'],['Trüffel','Getrocknete Tomaten'],['Birne','Salsiccia'],['Minze','Salsiccia']];
+const AVOID = [['Sardellen aus Cetara','Gorgonzola dolce'],['Sardellen aus Cetara','Honig'],['Sardellen aus Cetara','Hot Honey (Chili-Honig)'],['Sardellen aus Cetara','Frische Feigen'],['Sardellen aus Cetara','Taleggio'],['Minze','Gorgonzola dolce'],['Trüffel','Kalabrische Chili'],['Trüffel','ʼNduja'],['Balsamico-Reduktion','Pomodoro (San Marzano)'],['Birne','Pomodoro (San Marzano)'],['Frische Feigen','Pomodoro (San Marzano)'],['Kürbiscreme','Kirschtomaten'],['Pistaziencreme','Pistazienpesto'],['Pistaziencreme','Pistazien, gehackt'],['Ricotta-Creme','Ricotta'],['Ricotta-Creme','Burrata'],['Ricotta-Creme','Stracciatella'],['Ricotta-Creme','Gorgonzola dolce'],['Sardellen aus Cetara','Kürbiscreme'],['Sardellen aus Cetara','Pistaziencreme'],['Trüffel','Pomodoro (San Marzano)'],['Trüffel','Gelbe Datterini-Tomaten'],['Trüffel','Getrocknete Tomaten'],['Birne','Salsiccia'],['Minze','Salsiccia']];
 const avoidSet = new Set(AVOID.flatMap(([a,b])=>[a+'|'+b,b+'|'+a]));
 
 const LABEL = {rich:'cremig',acid:'säuerlich',fresh:'frisch',bitter:'herb',crunch:'knusprig',sweet:'süß',salt:'würzig',heat:'scharf',smoke:'rauchig',umami:'umami',nut:'nussig',strong:'kräftig',fish:'Meer'};
