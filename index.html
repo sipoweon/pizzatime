@@ -3,21 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#b23a1e">
+<meta name="theme-color" content="#a85a24">
 <title>Pizza Time</title>
-<link rel="icon" type="image/png" href="icon.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-106 -128 214 238'><circle cx='0' cy='2' r='104' fill='%23d8d3ea'/><path d='M0,0 L0,-97 A97,97 0 0 1 74.3,-62.4 Z' fill='%23f9e4cc'/><path d='M0,-97 L0,-120 A120,120 0 0 1 91.9,-77.1 L74.3,-62.4 A97,97 0 0 0 0,-97 Z' fill='%23a85a24'/><path d='M0,0 L0,-120 A120,120 0 0 1 91.9,-77.1 Z' fill='none' stroke='%23111' stroke-width='5' stroke-linejoin='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon.png">
 <style>
 :root{
-  --bg:#f7f2ea; --card:#fffdf9; --ink:#2b2420; --muted:#7a6d63; --line:#e7ddd0;
-  --accent:#b23a1e; --accent-ink:#fff; --accent-soft:#f6e1d9; --ok:#3f7d3a; --warn:#a66a00; --warn-soft:#fdf1d8;
-  --chip:#efe6da; --shadow:0 1px 2px rgba(60,40,20,.06),0 4px 16px rgba(60,40,20,.06);
+  --bg:#f4f2f9; --card:#ffffff; --ink:#1d1a22; --muted:#6c6577; --line:#e2deed; --lav:#d8d3ea;
+  --accent:#a85a24; --accent-ink:#fff; --accent-soft:#f9e4cc; --ok:#4c7a3d; --warn:#a85a24; --warn-soft:#fbeedd;
+  --chip:#ebe7f4; --shadow:0 1px 2px rgba(40,30,70,.05),0 4px 16px rgba(40,30,70,.06);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#1a1614; --card:#241f1c; --ink:#f1e9e1; --muted:#a8998c; --line:#3a322d;
-    --accent:#e2694a; --accent-ink:#1a1614; --accent-soft:#3d2620; --ok:#7fbf77; --warn:#e5b04f; --warn-soft:#3a2e17;
-    --chip:#302924; --shadow:none;
+    --bg:#16141b; --card:#211e28; --ink:#f2eff7; --muted:#a59eb2; --line:#35303f; --lav:#d8d3ea;
+    --accent:#d98b4f; --accent-ink:#16141b; --accent-soft:#3b2a1e; --ok:#8cc07d; --warn:#e3a66a; --warn-soft:#33261b;
+    --chip:#2c2834; --shadow:none;
   }
 }
 *{box-sizing:border-box}
@@ -26,8 +28,13 @@ body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-syste
 .wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
 header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 18px}
 header h1{margin:0;line-height:0}
-header .logo{height:84px;width:auto;display:block}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header .logo{background:#f7f2ea;border-radius:12px;padding:6px 10px}}
+header .logo{height:78px;width:auto;display:block}
+.brand{font:700 2.3rem/1 "Comic Neue","Comic Sans MS",cursive;letter-spacing:.01em;margin:0}
+header h1{display:flex;align-items:center;gap:12px}
+.plan{display:grid;gap:10px;margin-bottom:14px}
+.plansum{display:flex;gap:10px;flex-wrap:wrap}
+.plansum .kpi .v{font-size:1.05rem}
+.notice button{margin-left:6px}
 header p{margin:0;color:var(--muted);font-size:.92rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -102,8 +109,8 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
 <body>
 <div class="wrap">
   <header>
-    <h1><img class="logo" src="logo.png" alt="Pizza Time!" width="160" height="94"></h1>
-    <p><b style="color:var(--ink)">Pizzateig-Rechner</b><br>für Hochtemperatur-Öfen bis 450 °C · Stretch &amp; Fold</p>
+    <h1><svg class="logo" viewBox="-106 -128 214 238" aria-hidden="true"><circle cx="0" cy="2" r="104" fill="var(--lav,#d8d3ea)"/><path d="M0,0 L0,-97 A97,97 0 0 1 74.3,-62.4 Z" fill="#f9e4cc"/><path d="M0,-97 L0,-120 A120,120 0 0 1 91.9,-77.1 L74.3,-62.4 A97,97 0 0 0 0,-97 Z" fill="#a85a24"/><path d="M74.3,-62.4 A97,97 0 0 0 0,-97" fill="none" stroke="#111" stroke-width="4"/><path d="M0,0 L0,-120 A120,120 0 0 1 91.9,-77.1 Z" fill="none" stroke="#111" stroke-width="5" stroke-linejoin="round"/></svg><span class="brand">Pizza Time!</span></h1>
+    <p><b style="color:var(--ink)">Pizzateig-Rechner</b> für Hochtemperatur-Öfen bis 450 °C · Stretch &amp; Fold</p>
   </header>
 
   <section class="card">
@@ -114,7 +121,7 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
         <div class="stepper"><button data-step="n" data-d="-1" aria-label="weniger">−</button><input id="n" type="number" inputmode="numeric" min="1" max="50"><button data-step="n" data-d="1" aria-label="mehr">+</button></div>
       </div>
       <div>
-        <label class="f" for="h">Zeit bis Pizzaabend</label>
+        <label class="f" for="h">Dauer bis Pizzaabend</label>
         <div class="stepper"><button data-step="h" data-d="-1" aria-label="weniger">−</button><input id="h" type="number" inputmode="decimal" min="3" max="120" step="0.5"><span class="unit">h</span><button data-step="h" data-d="1" aria-label="mehr">+</button></div>
         <div class="chips" id="hchips"></div>
       </div>
@@ -122,10 +129,6 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
         <label class="f" for="rt">Raumtemperatur</label>
         <div class="stepper"><button data-step="rt" data-d="-1" aria-label="kälter">−</button><input id="rt" type="number" inputmode="decimal" min="14" max="32" step="0.5"><span class="unit">°C</span><button data-step="rt" data-d="1" aria-label="wärmer">+</button></div>
       </div>
-    </div>
-    <div style="margin-top:12px">
-      <label class="f" for="target">Pizzaabend um (Teig wird jetzt angesetzt)</label>
-      <input id="target" type="datetime-local">
     </div>
   </section>
 
@@ -163,6 +166,12 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
 
   <section class="card">
     <h2>Zeitplan</h2>
+    <div class="plan">
+      <div class="seg" id="planMode"><button data-v="now">Jetzt starten</button><button data-v="target">Pizzaabend planen</button></div>
+      <div id="targetWrap"><label class="f" for="target">Pizzaabend um</label><input id="target" type="datetime-local"></div>
+      <div class="plansum" id="plansum"></div>
+      <div id="planNotice"></div>
+    </div>
     <ul class="tl" id="timeline"></ul>
   </section>
 
@@ -242,10 +251,10 @@ function warmPhases(rt, tf, hours){
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 
 /* ---------- State ---------- */
-const DEFAULTS = {n:4, h:24, rt:22, style:'neap', yeast:'fresh', tf:5, ov:{}};
+const DEFAULTS = {n:4, h:24, rt:22, style:'neap', yeast:'fresh', tf:5, target:null, ov:{}};
 let S = load();
 function load(){
-  try{ const s=JSON.parse(localStorage.getItem('pizzateig-v1')); if(s&&STYLES[s.style]) return Object.assign({},DEFAULTS,s,{ov:s.ov||{}}); }catch(e){}
+  try{ const s=JSON.parse(localStorage.getItem('pizzateig-v1')); if(s&&STYLES[s.style]){ if(s.target && s.target<Date.now()) s.target=null; return Object.assign({},DEFAULTS,s,{ov:s.ov||{}}); } }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
 }
 function save(){ try{ localStorage.setItem('pizzateig-v1', JSON.stringify(S)); }catch(e){} }
@@ -413,7 +422,6 @@ function renderNotices(r){
   if (!r.plan.fridge && S.rt>=26 && S.h>=12) n.push(['','Warmer Raum: Teig im Auge behalten. Bei Übergare Teiglinge zwischendurch kurz kühl stellen.']);
   if (r.isP && r.plan.P<8) n.push(['','Für Poolish ist die Zeit knapp (Poolish < 8 h). Die Hefemenge wird hoch – Direktteig wäre hier die bessere Wahl.']);
   if (!r.isP && S.h<6) n.push(['','Kurze Gare: Pizza wird gehen, aber Aroma und Bekömmlichkeit profitieren stark von ≥ 8 h.']);
-  if (r.yPct > 0 && r.yeastG < 1) n.push(['ok',`Kleine Hefemenge: 1 g ${S.yeast==='dry'?'Trockenhefe':'Frischhefe'} in 100 g Wasser (aus der Rezeptmenge) auflösen und davon <b>${fmt(r.yeastG*100)} g</b> verwenden.`]);
   if (r.hyd>70 && S.style!=='poolish') n.push(['','Hohe Hydration – mehr Stretch & Fold-Runden und ein starkes Mehl einplanen.']);
   $('notices').innerHTML = n.map(([c,t])=>`<div class="notice ${c}">${t}</div>`).join('');
 }
@@ -461,8 +469,9 @@ function renderIngredients(r){
 }
 
 /* ---------- Zeitplan ---------- */
+const startMs = () => S.target ? S.target - S.h*3600e3 : Date.now();
 function clock(hOffset){
-  const d=new Date(Date.now()+hOffset*3600e3);
+  const d=new Date(startMs()+hOffset*3600e3);
   d.setMinutes(Math.round(d.getMinutes()/5)*5,0,0);
   const day=d.toLocaleDateString('de-DE',{weekday:'short'});
   const t=d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
@@ -528,20 +537,35 @@ function renderTips(r){
   $('tips').innerHTML = t.map(x=>`<li>${x}</li>`).join('');
 }
 
-function syncTarget(){
-  const d=new Date(Date.now()+S.h*3600e3);
-  const p=n=>String(n).padStart(2,'0');
-  $('target').value = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+const pad=n=>String(n).padStart(2,'0');
+const toLocal = ms => { const d=new Date(ms); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const fmtDT = ms => { const d=new Date(ms); return d.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'})+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr'; };
+function defaultTarget(){ // nächster Abend 19:00, der mit der Dauer erreichbar ist
+  const d=new Date(Date.now()+S.h*3600e3); const t=new Date(d); t.setHours(19,0,0,0);
+  if (t<d) t.setDate(t.getDate()+1); return t.getTime();
+}
+function renderPlan(){
+  const planned = !!S.target;
+  document.querySelectorAll('#planMode button').forEach(b=>b.setAttribute('aria-pressed', (b.dataset.v==='target')===planned));
+  $('targetWrap').style.display = planned ? '' : 'none';
+  if (planned && document.activeElement!==$('target')) $('target').value = toLocal(S.target);
+  const st=startMs(), end=st+S.h*3600e3;
+  $('plansum').innerHTML = `<div class="kpi"><div class="v">${planned?fmtDT(st):'jetzt'}</div><div class="l">Teig ansetzen</div></div><div class="kpi"><div class="v">${fmtDT(end)}</div><div class="l">Pizzaabend · ${fmt(S.h,S.h%1?1:0)} h Teigführung</div></div>`;
+  let n='';
+  if (planned && st < Date.now()-5*60e3){
+    const avail = Math.floor((S.target-Date.now())/1800e3)/2;
+    n = `<div class="notice">Der Start läge in der Vergangenheit. ${avail>=3?`Bis dahin bleiben noch ${fmt(avail,avail%1?1:0)} h.<button class="btn-link" id="fitH">Dauer auf ${fmt(avail,avail%1?1:0)} h setzen</button>`:'Bitte einen späteren Pizzaabend wählen.'}</div>`;
+  }
+  $('planNotice').innerHTML = n;
 }
 
 function render(){
   ['n','h','rt'].forEach(k=>{ if (document.activeElement!==$(k)) $(k).value=S[k]; });
-  if (document.activeElement!==$('target')) syncTarget();
   $('hchips').innerHTML=[8,12,24,48,72].map(h=>`<button class="chip" data-h="${h}">${h} h</button>`).join('');
   document.querySelectorAll('#yeastType button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===S.yeast));
   renderStyles();
   const r=compute();
-  renderRows(r); renderFridge(r); renderNotices(r); renderIngredients(r); renderTimeline(r); renderTips(r);
+  renderRows(r); renderFridge(r); renderNotices(r); renderIngredients(r); renderPlan(); renderTimeline(r); renderTips(r);
   $('resetAll').disabled = Object.keys(S.ov).length===0;
   save();
 }
@@ -557,6 +581,8 @@ document.addEventListener('click', e=>{
   else if (b.dataset.h){ setBase('h', +b.dataset.h); }
   else if (b.dataset.reset){ b.dataset.reset.split(',').forEach(k=>delete S.ov[k]); render(); }
   else if (b.id==='resetAll'){ S.ov={}; render(); }
+  else if (b.id==='fitH'){ setBase('h', Math.floor((S.target-Date.now())/1800e3)/2); }
+  else if (b.parentElement.id==='planMode'){ S.target = b.dataset.v==='target' ? (S.target||defaultTarget()) : null; render(); }
   else if (b.parentElement.id==='yeastType'){
     if (S.yeast!==b.dataset.v){ // überschriebenen Wert umrechnen
       if (S.ov.yeast!==undefined) S.ov.yeast = +(b.dataset.v==='dry' ? S.ov.yeast/3 : S.ov.yeast*3).toPrecision(2);
@@ -583,7 +609,7 @@ document.addEventListener('change', e=>{
   if (['n','h','rt'].includes(el.id)) setBase(el.id, parseFloat(el.value));
   else if (el.id==='target'){
     const t=new Date(el.value).getTime(); if(isNaN(t)) return;
-    setBase('h', Math.round((t-Date.now())/3600e3*2)/2);
+    S.target=t; render();
   }
   else if (el.id==='fridge'){
     const sugg=compute().fridgeSuggested;
