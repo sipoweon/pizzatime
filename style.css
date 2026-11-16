@@ -100,3 +100,4 @@ footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
 .nav{display:flex;gap:6px;margin:0 0 16px;background:var(--chip);padding:4px;border-radius:12px}
 .nav a{flex:1;text-align:center;text-decoration:none;color:var(--ink);padding:8px 10px;border-radius:9px;font-size:.92rem;font-weight:600}
 .nav a[aria-current=page]{background:var(--card);box-shadow:var(--shadow);color:var(--accent)}
+.seg.full{display:flex}.seg.full button{flex:1}
